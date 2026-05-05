@@ -32,6 +32,9 @@ jobs:
       - name: Validate Prisma schema
         run: npm run db:validate
 
+      - name: Generate Prisma client
+        run: npm run db:generate
+
       - name: Check formatting
         run: npm run format:check
 
