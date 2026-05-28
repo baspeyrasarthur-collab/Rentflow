@@ -24,7 +24,7 @@
 
 ## Logique frontend/backend
 
-Le frontend actuel expose surtout des pages serveur Next.js et des tableaux de bord en lecture seule. Les données sensibles sont récupérées côté serveur via `server/*`.
+Le frontend actuel expose surtout des pages serveur Next.js, les tableaux de bord et le CRUD proprietaire des logements. Les donnees sensibles sont recuperees cote serveur via `server/*`.
 
 Les futures mutations métier doivent rester côté serveur quand elles touchent permissions, argent, contrats, mandats, paiements ou données personnelles.
 

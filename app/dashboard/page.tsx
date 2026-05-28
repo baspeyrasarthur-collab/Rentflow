@@ -2,7 +2,6 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
-import { getHomePathForRole } from "@/server/auth/roles";
 import { prisma } from "@/server/db/prisma";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +18,16 @@ export default async function DashboardPage() {
     select: {
       role: true,
       disabledAt: true,
+      ownerProfile: {
+        select: {
+          id: true,
+        },
+      },
+      tenantProfile: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 
@@ -37,5 +46,17 @@ export default async function DashboardPage() {
     );
   }
 
-  redirect(getHomePathForRole(user.role));
+  if (user.role === "ADMIN") {
+    redirect("/admin");
+  }
+
+  if (user.ownerProfile) {
+    redirect("/owner");
+  }
+
+  if (user.tenantProfile) {
+    redirect("/tenant");
+  }
+
+  redirect("/onboarding");
 }

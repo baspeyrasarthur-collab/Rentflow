@@ -1,7 +1,14 @@
-import { requireRole } from "@/server/auth/current-user";
+import { requireOwnerAccess } from "@/server/auth/access";
+import {
+  canCreatePropertyForPlan,
+  getMaxPropertiesForPlan,
+} from "@/server/billing/plans";
 import { prisma } from "@/server/db/prisma";
 import { AppError } from "@/server/errors";
-import { propertyIdSchema } from "@/server/validation";
+import {
+  propertyDeleteConfirmationSchema,
+  propertyIdSchema,
+} from "@/server/validation";
 
 const propertyListSelect = {
   id: true,
@@ -16,6 +23,8 @@ const propertyListSelect = {
   furnished: true,
   isColocation: true,
   status: true,
+  imageUrl: true,
+  imageStorageKey: true,
   createdAt: true,
   updatedAt: true,
   _count: {
@@ -82,24 +91,7 @@ const propertyDetailSelect = {
 } as const;
 
 export async function getCurrentOwnerProfileForProperties() {
-  const user = await requireRole(["OWNER"]);
-
-  const ownerProfile = await prisma.ownerProfile.findUnique({
-    where: { userId: user.id },
-    select: {
-      id: true,
-      userId: true,
-    },
-  });
-
-  if (!ownerProfile) {
-    throw new AppError(
-      "NOT_FOUND",
-      "No owner profile exists for this RentFlow user.",
-    );
-  }
-
-  return { user, ownerProfile };
+  return requireOwnerAccess();
 }
 
 export async function listOwnerProperties() {
@@ -116,6 +108,25 @@ export async function listOwnerProperties() {
   });
 }
 
+export async function getOwnerPropertyCreationAvailability() {
+  const { ownerProfile } = await getCurrentOwnerProfileForProperties();
+  const currentPropertyCount = await prisma.property.count({
+    where: {
+      ownerProfileId: ownerProfile.id,
+    },
+  });
+
+  return {
+    plan: ownerProfile.plan,
+    currentPropertyCount,
+    maxProperties: getMaxPropertiesForPlan(ownerProfile.plan),
+    canCreateProperty: canCreatePropertyForPlan(
+      ownerProfile.plan,
+      currentPropertyCount,
+    ),
+  };
+}
+
 export async function getOwnerPropertyById(propertyId: string) {
   const parsedPropertyId = propertyIdSchema.parse(propertyId);
   const { ownerProfile } = await getCurrentOwnerProfileForProperties();
@@ -126,5 +137,225 @@ export async function getOwnerPropertyById(propertyId: string) {
       ownerProfileId: ownerProfile.id,
     },
     select: propertyDetailSelect,
+  });
+}
+
+export async function deleteOwnerPropertyPermanently(
+  propertyId: string,
+  confirmation: string,
+) {
+  const parsedPropertyId = propertyIdSchema.parse(propertyId);
+  const { user, ownerProfile } = await getCurrentOwnerProfileForProperties();
+  const parsedConfirmation =
+    propertyDeleteConfirmationSchema.safeParse(confirmation);
+
+  if (!parsedConfirmation.success) {
+    throw new AppError(
+      "BAD_REQUEST",
+      "Type SUPPRIMER to confirm permanent property deletion.",
+    );
+  }
+
+  const property = await prisma.property.findFirst({
+    where: {
+      id: parsedPropertyId,
+      ownerProfileId: ownerProfile.id,
+    },
+    select: {
+      id: true,
+      name: true,
+      ownerProfileId: true,
+    },
+  });
+
+  if (!property) {
+    throw new AppError(
+      "NOT_FOUND",
+      "No deletable property exists for this owner profile.",
+    );
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const contracts = await tx.rentalContract.findMany({
+      where: {
+        propertyId: property.id,
+        ownerProfileId: ownerProfile.id,
+      },
+      select: {
+        id: true,
+      },
+    });
+    const contractIds = contracts.map((contract) => contract.id);
+
+    const contractTenants =
+      contractIds.length > 0
+        ? await tx.contractTenant.findMany({
+            where: {
+              rentalContractId: {
+                in: contractIds,
+              },
+            },
+            select: {
+              id: true,
+            },
+          })
+        : [];
+    const contractTenantIds = contractTenants.map(
+      (contractTenant) => contractTenant.id,
+    );
+
+    const payments = await tx.payment.findMany({
+      where: {
+        propertyId: property.id,
+        ownerProfileId: ownerProfile.id,
+      },
+      select: {
+        id: true,
+      },
+    });
+    const paymentIds = payments.map((payment) => payment.id);
+
+    const paymentDeclarations =
+      paymentIds.length > 0
+        ? await tx.paymentDeclaration.deleteMany({
+            where: {
+              paymentId: {
+                in: paymentIds,
+              },
+            },
+          })
+        : { count: 0 };
+
+    const platformCommissions =
+      paymentIds.length > 0
+        ? await tx.platformCommission.deleteMany({
+            where: {
+              paymentId: {
+                in: paymentIds,
+              },
+            },
+          })
+        : { count: 0 };
+
+    const receipts = await tx.receipt.deleteMany({
+      where: {
+        propertyId: property.id,
+        ownerProfileId: ownerProfile.id,
+      },
+    });
+
+    const paymentsDeleted = await tx.payment.deleteMany({
+      where: {
+        propertyId: property.id,
+        ownerProfileId: ownerProfile.id,
+      },
+    });
+
+    const paymentMandates =
+      contractIds.length > 0 || contractTenantIds.length > 0
+        ? await tx.paymentMandate.deleteMany({
+            where: {
+              OR: [
+                ...(contractIds.length > 0
+                  ? [
+                      {
+                        rentalContractId: {
+                          in: contractIds,
+                        },
+                      },
+                    ]
+                  : []),
+                ...(contractTenantIds.length > 0
+                  ? [
+                      {
+                        contractTenantId: {
+                          in: contractTenantIds,
+                        },
+                      },
+                    ]
+                  : []),
+              ],
+            },
+          })
+        : { count: 0 };
+
+    const invitations = await tx.invitation.deleteMany({
+      where: {
+        propertyId: property.id,
+        ownerProfileId: ownerProfile.id,
+      },
+    });
+
+    const expenses = await tx.expense.deleteMany({
+      where: {
+        propertyId: property.id,
+      },
+    });
+
+    const recurringExpenseRules = await tx.recurringExpenseRule.deleteMany({
+      where: {
+        propertyId: property.id,
+      },
+    });
+
+    const contractTenantsDeleted =
+      contractIds.length > 0
+        ? await tx.contractTenant.deleteMany({
+            where: {
+              rentalContractId: {
+                in: contractIds,
+              },
+            },
+          })
+        : { count: 0 };
+
+    const rentalContracts = await tx.rentalContract.deleteMany({
+      where: {
+        propertyId: property.id,
+        ownerProfileId: ownerProfile.id,
+      },
+    });
+
+    await tx.property.delete({
+      where: {
+        id: property.id,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    const deletedRelatedDataSummary = {
+      rentalContracts: rentalContracts.count,
+      contractTenants: contractTenantsDeleted.count,
+      invitations: invitations.count,
+      paymentMandates: paymentMandates.count,
+      payments: paymentsDeleted.count,
+      paymentDeclarations: paymentDeclarations.count,
+      receipts: receipts.count,
+      platformCommissions: platformCommissions.count,
+      expenses: expenses.count,
+      recurringExpenseRules: recurringExpenseRules.count,
+    };
+
+    await tx.auditLog.create({
+      data: {
+        userId: user.id,
+        action: "property.deleted",
+        entityType: "Property",
+        entityId: property.id,
+        metadata: {
+          source: "owner_delete_property",
+          propertyName: property.name,
+          ownerProfileId: ownerProfile.id,
+          deletedRelatedDataSummary,
+        },
+      },
+    });
+
+    return {
+      propertyId: property.id,
+      deletedRelatedDataSummary,
+    };
   });
 }

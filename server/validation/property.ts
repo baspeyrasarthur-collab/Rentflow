@@ -10,6 +10,7 @@ const emptyStringAsUndefined = (value: unknown) =>
   value === "" ? undefined : value;
 
 export const propertyIdSchema = entityIdSchema;
+export const propertyDeleteConfirmationSchema = z.literal("SUPPRIMER");
 
 export const propertyTypeSchema = z.enum([
   "APARTMENT",

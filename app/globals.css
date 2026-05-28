@@ -50,75 +50,75 @@
 
 :root {
   --font-rentflow-sans:
-    Arial, Helvetica, "Segoe UI", system-ui, -apple-system, sans-serif;
+    "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
   --font-rentflow-mono:
     "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: #edf6f3;
+  --foreground: #102a35;
+  --card: #fbfdf9;
+  --card-foreground: #102a35;
+  --popover: #fbfdf9;
+  --popover-foreground: #102a35;
+  --primary: #16766f;
+  --primary-foreground: #f6fbf7;
+  --secondary: #dcebe6;
+  --secondary-foreground: #163743;
+  --muted: #dfece8;
+  --muted-foreground: #60777c;
+  --accent: #cfe9e2;
+  --accent-foreground: #12343f;
+  --destructive: #a94f43;
+  --border: #c8dbd7;
+  --input: #c8dbd7;
+  --ring: #2d9fb8;
+  --chart-1: #16766f;
+  --chart-2: #7fa891;
+  --chart-3: #2d9fb8;
+  --chart-4: #b9852f;
+  --chart-5: #a94f43;
+  --radius: 0.75rem;
+  --sidebar: #e6f1ee;
+  --sidebar-foreground: #102a35;
+  --sidebar-primary: #16766f;
+  --sidebar-primary-foreground: #f6fbf7;
+  --sidebar-accent: #d6e8e3;
+  --sidebar-accent-foreground: #12343f;
+  --sidebar-border: #c8dbd7;
+  --sidebar-ring: #2d9fb8;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #03151c;
+  --foreground: #f4f1ea;
+  --card: #092631;
+  --card-foreground: #f4f1ea;
+  --popover: #092631;
+  --popover-foreground: #f4f1ea;
+  --primary: #6ec6b8;
+  --primary-foreground: #092832;
+  --secondary: #0e3440;
+  --secondary-foreground: #e9f3ef;
+  --muted: #0b2b36;
+  --muted-foreground: #a6bfba;
+  --accent: #103d49;
+  --accent-foreground: #eef7f4;
+  --destructive: #c66b5c;
+  --border: rgb(224 238 232 / 15%);
+  --input: rgb(224 238 232 / 18%);
+  --ring: #8ad7e8;
+  --chart-1: #6ec6b8;
+  --chart-2: #9bbfa8;
+  --chart-3: #8ad7e8;
+  --chart-4: #d9a85c;
+  --chart-5: #c66b5c;
+  --sidebar: #041821;
+  --sidebar-foreground: #f4f1ea;
+  --sidebar-primary: #6ec6b8;
+  --sidebar-primary-foreground: #092832;
+  --sidebar-accent: #0e3440;
+  --sidebar-accent-foreground: #eef7f4;
+  --sidebar-border: rgb(224 238 232 / 15%);
+  --sidebar-ring: #8ad7e8;
 }
 
 @layer base {
@@ -127,8 +127,13 @@
   }
   body {
     @apply bg-background text-foreground;
+    text-rendering: optimizeLegibility;
   }
   html {
     @apply font-sans;
+  }
+
+  html[data-spotlight-effects="off"] .rentflow-spotlight-effect {
+    display: none;
   }
 }

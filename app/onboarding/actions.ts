@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { prisma } from "@/server/db/prisma";
 import { AppError } from "@/server/errors";
+import { getSafeReturnTo } from "@/server/security/redirects";
 import { onboardingFormSchema } from "@/server/validation";
 
 function getPrimaryEmail(clerkUser: Awaited<ReturnType<typeof currentUser>>) {
@@ -20,9 +21,19 @@ function getPrimaryEmail(clerkUser: Awaited<ReturnType<typeof currentUser>>) {
 
 export async function createRentFlowUserAction(formData: FormData) {
   const { userId, redirectToSignIn } = await auth();
+  const returnTo = getSafeReturnTo(formData.get("returnTo"));
 
   if (!userId) {
     return redirectToSignIn();
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: { clerkUserId: userId },
+    select: { id: true },
+  });
+
+  if (existingUser) {
+    redirect(returnTo);
   }
 
   const parsed = onboardingFormSchema.safeParse({
@@ -93,5 +104,5 @@ export async function createRentFlowUserAction(formData: FormData) {
     return createdUser;
   });
 
-  redirect("/dashboard");
+  redirect(returnTo);
 }

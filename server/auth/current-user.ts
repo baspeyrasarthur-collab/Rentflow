@@ -19,6 +19,15 @@ const currentUserSelect = {
   lastName: true,
   role: true,
   disabledAt: true,
+  phone: true,
+  addressLine1: true,
+  addressLine2: true,
+  postalCode: true,
+  city: true,
+  country: true,
+  taxResidenceCountry: true,
+  profileImageUrl: true,
+  profileImageStorageKey: true,
 } as const;
 
 export async function getCurrentUser() {

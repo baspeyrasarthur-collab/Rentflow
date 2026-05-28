@@ -3,10 +3,27 @@ import { redirect } from "next/navigation";
 
 import { createRentFlowUserAction } from "@/app/onboarding/actions";
 import { prisma } from "@/server/db/prisma";
+import { getSafeReturnTo } from "@/server/security/redirects";
 
 export const dynamic = "force-dynamic";
 
-export default async function OnboardingPage() {
+type OnboardingPageProps = {
+  searchParams: Promise<{
+    returnTo?: string | string[];
+  }>;
+};
+
+function getReturnToParam(returnTo: string | string[] | undefined) {
+  return Array.isArray(returnTo) ? returnTo[0] : returnTo;
+}
+
+export default async function OnboardingPage({
+  searchParams,
+}: OnboardingPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const safeReturnTo = getSafeReturnTo(
+    getReturnToParam(resolvedSearchParams.returnTo),
+  );
   const { userId, redirectToSignIn } = await auth();
 
   if (!userId) {
@@ -19,7 +36,7 @@ export default async function OnboardingPage() {
   });
 
   if (existingUser) {
-    redirect("/dashboard");
+    redirect(safeReturnTo);
   }
 
   const clerkUser = await currentUser();
@@ -46,6 +63,7 @@ export default async function OnboardingPage() {
         </div>
 
         <form action={createRentFlowUserAction} className="space-y-6">
+          <input name="returnTo" type="hidden" value={safeReturnTo} />
           <fieldset className="grid gap-4 sm:grid-cols-2">
             <legend className="sr-only">Role RentFlow</legend>
             <label className="cursor-pointer rounded-lg border bg-card p-5 text-card-foreground transition hover:border-foreground">

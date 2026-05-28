@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Button, buttonVariants } from "@/components/ui/button";
+import { InfoAlert } from "@/components/ui/rentflow";
+import { cn } from "@/lib/utils";
 import { redirectAfterRoleAccessError } from "@/server/auth/current-user";
 import { getOwnerPropertyById } from "@/server/owner/properties";
 
@@ -15,12 +17,37 @@ async function getPropertyForPage(propertyId: string) {
   }
 }
 
+function getSearchParamValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function getPropertyFocusMessage(focus: string | undefined) {
+  if (focus === "missing-fields") {
+    return "Completez les informations manquantes du logement pour avancer dans le bon ordre.";
+  }
+
+  if (focus === "characteristics") {
+    return "Verifiez les caracteristiques du logement : type, surface, meuble, colocation.";
+  }
+
+  if (focus === "fiscal-type") {
+    return "Action ciblee : indiquez le type fiscal du logement pour ameliorer la preparation de vos donnees fiscales.";
+  }
+
+  return null;
+}
+
 export default async function EditOwnerPropertyPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<{ focus?: string | string[] }>;
 }) {
   const { id } = await params;
+  const resolvedSearchParams = await searchParams;
+  const focus = getSearchParamValue(resolvedSearchParams?.focus);
+  const focusMessage = getPropertyFocusMessage(focus);
   const property = await getPropertyForPage(id);
 
   if (!property) {
@@ -54,8 +81,28 @@ export default async function EditOwnerPropertyPage({
         </div>
       </div>
 
+      {focusMessage ? (
+        <InfoAlert title="Action ciblee" tone="warning">
+          {focusMessage}
+        </InfoAlert>
+      ) : null}
+
       <form action={updateAction} className="space-y-6">
-        <div className="grid gap-4 rounded-lg border bg-card p-5 text-card-foreground sm:grid-cols-2">
+        <div
+          className={cn(
+            "grid gap-4 rounded-lg border bg-card p-5 text-card-foreground transition-all duration-300 sm:grid-cols-2",
+            focusMessage
+              ? "border-chart-4/75 bg-chart-4/10 shadow-lg shadow-chart-4/10"
+              : "",
+          )}
+          id={
+            focus === "fiscal-type"
+              ? "fiscal-type"
+              : focus === "characteristics"
+                ? "characteristics"
+                : "missing-fields"
+          }
+        >
           <div className="space-y-2 sm:col-span-2">
             <label className="text-sm font-medium" htmlFor="name">
               Nom du logement
@@ -178,7 +225,13 @@ export default async function EditOwnerPropertyPage({
             />
           </div>
 
-          <div className="flex items-center gap-3 rounded-lg border bg-background px-3 py-3">
+          <div
+            className={cn(
+              "flex items-center gap-3 rounded-lg border bg-background px-3 py-3 transition-all duration-300",
+              focus === "fiscal-type" &&
+                "border-chart-4/75 bg-chart-4/10 shadow-md shadow-chart-4/10",
+            )}
+          >
             <input name="furnishedPresent" type="hidden" value="1" />
             <input
               className="size-4 rounded border"

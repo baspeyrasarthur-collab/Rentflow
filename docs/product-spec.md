@@ -23,7 +23,8 @@ Le produit doit permettre de gérer progressivement logements, locataires, contr
 - Accueil, connexion et inscription via Clerk.
 - Onboarding pour créer un utilisateur interne `OWNER` ou `TENANT`.
 - Redirection `/dashboard` selon le rôle interne.
-- Tableaux de bord en lecture seule pour propriétaire, locataire et admin.
+- Tableaux de bord pour proprietaire, locataire et admin ; locataire et admin restent en lecture seule.
+- CRUD proprietaire pour lister, creer, consulter, modifier et archiver logiquement ses logements.
 - Modèle de données Prisma pour utilisateurs, profils, logements, contrats, colocations, invitations, paiements, mandats, quittances, dépenses, commissions, notifications, KYC, consentements, webhooks et audit logs.
 - Seed de développement avec données fictives.
 - Providers mock pour paiement, KYC, email et stockage.
@@ -31,7 +32,6 @@ Le produit doit permettre de gérer progressivement logements, locataires, contr
 
 ## Fonctionnalités prévues
 
-- CRUD propriétaire pour les logements.
 - Création de contrats individuels et colocations.
 - Invitations locataires et acceptation côté locataire.
 - Mandats de paiement simulés.

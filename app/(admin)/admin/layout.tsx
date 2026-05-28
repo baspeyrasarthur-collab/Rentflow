@@ -9,11 +9,17 @@ export default async function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let user: Awaited<ReturnType<typeof requireRole>>;
+
   try {
-    await requireRole(["ADMIN"]);
+    user = await requireRole(["ADMIN"]);
   } catch (error) {
-    await redirectAfterRoleAccessError(error);
+    return redirectAfterRoleAccessError(error);
   }
 
-  return <AppShell roleLabel="Administration">{children}</AppShell>;
+  return (
+    <AppShell role={user.role} roleLabel="Administration">
+      {children}
+    </AppShell>
+  );
 }

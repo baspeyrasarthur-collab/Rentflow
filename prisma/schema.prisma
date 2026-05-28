@@ -15,18 +15,27 @@ model User {
   lastName        String?
   role            UserRole
   phone           String?
+  addressLine1    String?
+  addressLine2    String?
+  postalCode      String?
+  city            String?
+  country         String?
+  taxResidenceCountry String?
   emailVerifiedAt DateTime?
   disabledAt      DateTime?
+  profileImageUrl        String?
+  profileImageStorageKey String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  ownerProfile          OwnerProfile?
-  tenantProfile         TenantProfile?
-  notifications         Notification[]
-  identityVerifications IdentityVerification[]
-  consentEvents         ConsentEvent[]
-  auditLogs             AuditLog[]
-  createdExpenses       Expense[]
+  ownerProfile                 OwnerProfile?
+  tenantProfile                TenantProfile?
+  notifications                Notification[]
+  identityVerifications        IdentityVerification[]
+  consentEvents                ConsentEvent[]
+  auditLogs                    AuditLog[]
+  createdExpenses              Expense[]
+  createdRecurringExpenseRules RecurringExpenseRule[]
 
   @@index([role])
   @@index([email])
@@ -36,6 +45,7 @@ model User {
 model OwnerProfile {
   id                         String                     @id @default(cuid())
   userId                     String                     @unique
+  plan                       OwnerPlan                  @default(FREE)
   billingName                String?
   billingAddressLine1        String?
   billingAddressLine2        String?
@@ -54,6 +64,7 @@ model OwnerProfile {
   invitations         Invitation[]
   payments            Payment[]
   receipts            Receipt[]
+  tenantRequests      TenantRequest[]
   platformCommissions PlatformCommission[]
 
   @@index([identityVerificationStatus])
@@ -67,12 +78,14 @@ model TenantProfile {
   createdAt                  DateTime                   @default(now())
   updatedAt                  DateTime                   @updatedAt
 
-  user            User             @relation(fields: [userId], references: [id], onDelete: Restrict)
-  contractTenants ContractTenant[]
-  paymentMandates PaymentMandate[]
-  payments        Payment[]
-  expenses        Expense[]
-  receipts        Receipt[]
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Restrict)
+  contractTenants     ContractTenant[]
+  paymentMandates     PaymentMandate[]
+  payments            Payment[]
+  paymentDeclarations PaymentDeclaration[]
+  expenses            Expense[]
+  receipts            Receipt[]
+  tenantRequests      TenantRequest[]
 
   @@index([identityVerificationStatus])
 }
@@ -91,15 +104,19 @@ model Property {
   furnished      Boolean        @default(false)
   isColocation   Boolean        @default(false)
   status         PropertyStatus @default(DRAFT)
+  imageUrl       String?
+  imageStorageKey String?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  ownerProfile    OwnerProfile     @relation(fields: [ownerProfileId], references: [id], onDelete: Restrict)
-  rentalContracts RentalContract[]
-  invitations     Invitation[]
-  payments        Payment[]
-  expenses        Expense[]
-  receipts        Receipt[]
+  ownerProfile          OwnerProfile           @relation(fields: [ownerProfileId], references: [id], onDelete: Restrict)
+  rentalContracts       RentalContract[]
+  invitations           Invitation[]
+  payments              Payment[]
+  expenses              Expense[]
+  recurringExpenseRules RecurringExpenseRule[]
+  receipts              Receipt[]
+  tenantRequests        TenantRequest[]
 
   @@index([ownerProfileId, status])
   @@index([city, country])
@@ -131,6 +148,7 @@ model RentalContract {
   payments        Payment[]
   expenses        Expense[]
   receipts        Receipt[]
+  tenantRequests TenantRequest[]
 
   @@index([propertyId, status])
   @@index([ownerProfileId, status])
@@ -156,13 +174,15 @@ model ContractTenant {
   createdAt                 DateTime             @default(now())
   updatedAt                 DateTime             @updatedAt
 
-  rentalContract  RentalContract   @relation(fields: [rentalContractId], references: [id], onDelete: Restrict)
-  tenantProfile   TenantProfile?   @relation(fields: [tenantProfileId], references: [id], onDelete: SetNull)
-  invitations     Invitation[]
-  paymentMandates PaymentMandate[]
-  payments        Payment[]
-  expenses        Expense[]
-  receipts        Receipt[]
+  rentalContract      RentalContract       @relation(fields: [rentalContractId], references: [id], onDelete: Restrict)
+  tenantProfile       TenantProfile?       @relation(fields: [tenantProfileId], references: [id], onDelete: SetNull)
+  invitations         Invitation[]
+  paymentMandates     PaymentMandate[]
+  payments            Payment[]
+  paymentDeclarations PaymentDeclaration[]
+  expenses            Expense[]
+  receipts            Receipt[]
+  tenantRequests      TenantRequest[]
 
   @@unique([rentalContractId, tenantProfileId])
   @@index([invitedEmail])
@@ -242,12 +262,13 @@ model Payment {
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
 
-  property           Property            @relation(fields: [propertyId], references: [id], onDelete: Restrict)
-  rentalContract     RentalContract      @relation(fields: [rentalContractId], references: [id], onDelete: Restrict)
-  contractTenant     ContractTenant?     @relation(fields: [contractTenantId], references: [id], onDelete: SetNull)
-  tenantProfile      TenantProfile       @relation(fields: [tenantProfileId], references: [id], onDelete: Restrict)
-  ownerProfile       OwnerProfile        @relation(fields: [ownerProfileId], references: [id], onDelete: Restrict)
+  property           Property             @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  rentalContract     RentalContract       @relation(fields: [rentalContractId], references: [id], onDelete: Restrict)
+  contractTenant     ContractTenant?      @relation(fields: [contractTenantId], references: [id], onDelete: SetNull)
+  tenantProfile      TenantProfile        @relation(fields: [tenantProfileId], references: [id], onDelete: Restrict)
+  ownerProfile       OwnerProfile         @relation(fields: [ownerProfileId], references: [id], onDelete: Restrict)
   platformCommission PlatformCommission?
+  declarations       PaymentDeclaration[]
 
   @@unique([provider, providerPaymentId])
   @@index([status, dueDate])
@@ -258,31 +279,82 @@ model Payment {
   @@index([type, status])
 }
 
+model PaymentDeclaration {
+  id               String                 @id @default(cuid())
+  paymentId        String
+  tenantProfileId  String
+  contractTenantId String?
+  declarationType  PaymentDeclarationType
+  declaredAt       DateTime               @default(now())
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  payment        Payment         @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  tenantProfile  TenantProfile   @relation(fields: [tenantProfileId], references: [id], onDelete: Restrict)
+  contractTenant ContractTenant? @relation(fields: [contractTenantId], references: [id], onDelete: SetNull)
+
+  @@index([paymentId, declaredAt])
+  @@index([tenantProfileId, declaredAt])
+  @@index([contractTenantId, declaredAt])
+  @@index([declarationType, declaredAt])
+}
+
+model RecurringExpenseRule {
+  id              String                     @id @default(cuid())
+  propertyId      String
+  createdByUserId String
+  label           String
+  amountInCents   Int
+  currency        String                     @default("EUR")
+  category        ExpenseCategory
+  dayOfMonth      Int
+  startMonth      DateTime
+  endMonth        DateTime?
+  status          RecurringExpenseRuleStatus @default(ACTIVE)
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  property  Property  @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  createdBy User      @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
+  expenses  Expense[]
+
+  @@index([propertyId, status])
+  @@index([createdByUserId, status])
+  @@index([startMonth, endMonth])
+}
+
 model Expense {
-  id               String        @id @default(cuid())
+  id               String          @id @default(cuid())
   propertyId       String
   rentalContractId String?
   contractTenantId String?
   tenantProfileId  String?
+  recurringRuleId  String?
   createdByUserId  String
   label            String
   description      String?
   amountInCents    Int
-  currency         String        @default("EUR")
+  currency         String          @default("EUR")
   dueDate          DateTime
-  status           ExpenseStatus @default(PLANNED)
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  occurrenceMonth  DateTime?
+  status           ExpenseStatus   @default(PLANNED)
+  category         ExpenseCategory @default(OTHER)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 
-  property       Property        @relation(fields: [propertyId], references: [id], onDelete: Restrict)
-  rentalContract RentalContract? @relation(fields: [rentalContractId], references: [id], onDelete: SetNull)
-  contractTenant ContractTenant? @relation(fields: [contractTenantId], references: [id], onDelete: SetNull)
-  tenantProfile  TenantProfile?  @relation(fields: [tenantProfileId], references: [id], onDelete: SetNull)
-  createdBy      User            @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
+  property       Property              @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  rentalContract RentalContract?       @relation(fields: [rentalContractId], references: [id], onDelete: SetNull)
+  contractTenant ContractTenant?       @relation(fields: [contractTenantId], references: [id], onDelete: SetNull)
+  tenantProfile  TenantProfile?        @relation(fields: [tenantProfileId], references: [id], onDelete: SetNull)
+  recurringRule  RecurringExpenseRule? @relation(fields: [recurringRuleId], references: [id], onDelete: SetNull)
+  createdBy      User                  @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
 
+  @@unique([recurringRuleId, occurrenceMonth])
   @@index([propertyId, status])
   @@index([rentalContractId, status])
   @@index([tenantProfileId, status])
+  @@index([recurringRuleId])
+  @@index([occurrenceMonth])
   @@index([dueDate, status])
 }
 
@@ -353,6 +425,37 @@ model Notification {
   @@index([userId, readAt])
   @@index([userId, createdAt])
   @@index([type, createdAt])
+}
+
+model TenantRequest {
+  id               String                @id @default(cuid())
+  propertyId       String
+  rentalContractId String?
+  contractTenantId String?
+  tenantProfileId  String
+  ownerProfileId   String
+  category         TenantRequestCategory @default(GENERAL)
+  title            String
+  description      String
+  status           TenantRequestStatus   @default(OPEN)
+  ownerResponse    String?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  resolvedAt       DateTime?
+  refusedAt        DateTime?
+  acknowledgedAt   DateTime?
+
+  property       Property        @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  rentalContract RentalContract? @relation(fields: [rentalContractId], references: [id], onDelete: SetNull)
+  contractTenant ContractTenant? @relation(fields: [contractTenantId], references: [id], onDelete: SetNull)
+  tenantProfile  TenantProfile   @relation(fields: [tenantProfileId], references: [id], onDelete: Restrict)
+  ownerProfile   OwnerProfile    @relation(fields: [ownerProfileId], references: [id], onDelete: Restrict)
+
+  @@index([ownerProfileId, status, createdAt])
+  @@index([tenantProfileId, status, createdAt])
+  @@index([propertyId, status])
+  @@index([rentalContractId, status])
+  @@index([contractTenantId, status])
 }
 
 model IdentityVerification {
@@ -444,6 +547,12 @@ enum UserRole {
   ADMIN
 }
 
+enum OwnerPlan {
+  FREE
+  PRO
+  SCALE
+}
+
 enum PropertyStatus {
   DRAFT
   ACTIVE
@@ -527,11 +636,30 @@ enum PaymentStatus {
   DISPUTED
 }
 
+enum PaymentDeclarationType {
+  PAID_EXTERNALLY
+  NOT_PAID_YET
+}
+
 enum ExpenseStatus {
   PLANNED
   PENDING
   PAID
   CANCELED
+}
+
+enum RecurringExpenseRuleStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum ExpenseCategory {
+  LOAN_REPAYMENT
+  INSURANCE
+  CONDO_FEES
+  PROPERTY_TAX
+  WORKS
+  OTHER
 }
 
 enum ReceiptType {
@@ -551,6 +679,23 @@ enum PlatformCommissionStatus {
   CHARGED
   CANCELED
   REFUNDED
+}
+
+enum TenantRequestStatus {
+  OPEN
+  RESOLVED_BY_OWNER
+  REFUSED_BY_OWNER
+  ACKNOWLEDGED_BY_TENANT
+  CANCELED
+}
+
+enum TenantRequestCategory {
+  GENERAL
+  REPAIR
+  DOCUMENT
+  PAYMENT
+  RECEIPT
+  OTHER
 }
 
 enum IdentityVerificationStatus {

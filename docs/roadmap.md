@@ -8,8 +8,8 @@ Priorités :
 
 1. Finaliser la Phase 0 : docs, `npm run check`, CI minimale et check global.
 2. Clarifier le périmètre exact du MVP Phase 1.
-3. Ajouter le CRUD propriétaire pour les logements.
-4. Ajouter la création de contrat individuel.
+3. Stabiliser le CRUD proprietaire pour les logements.
+4. Ajouter la creation de contrat individuel.
 5. Ajouter les invitations locataires avec email mock.
 6. Ajouter l'acceptation d'invitation côté locataire.
 7. Ajouter les mandats, paiements simulés et quittances après validation du flux logement/contrat/invitation.
@@ -42,7 +42,7 @@ Objectif : préparer un déploiement exploitable.
 2. Script `npm run check`.
 3. CI minimale sur `npm run check`.
 4. Spécification courte du MVP Phase 1.
-5. CRUD logements propriétaire.
+5. Stabilisation CRUD logements proprietaire.
 6. Tests du CRUD logements.
 7. Contrat individuel.
 8. Invitations locataires.
