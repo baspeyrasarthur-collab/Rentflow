@@ -60,12 +60,12 @@
 - Composants UI : `ActionCard`, `StatCard` et `StatusBadge` ont des accents plus visibles et servent de base a la refonte progressive.
 - Landing publique V1 : `/` presente RentFlow comme un copilote de gestion locative guidee, avec CTA principal `Voir le site` vers `/demo`, CTA de creation de compte et lien de connexion.
 - Parcours public cible : landing -> demo -> creation/connexion -> onboarding role -> plan proprietaire si applicable -> dashboard ; `/dashboard` continue de rediriger les utilisateurs connectes vers leur espace reel.
-- Demo publique V1 : routes `/demo`, `/demo/finances` et `/demo/properties`, separees des routes metier protegees `/owner` et `/tenant`.
-- Demo publique V1 : donnees fictives centralisees dans `app/demo/demo-data.ts`, aucune donnee reelle, aucun Prisma, aucun `requireRole`, aucun Clerk obligatoire, aucune server action, aucune mutation metier et aucun provider.
-- Demo publique V1 : navigation publique dediee dans `app/demo/layout.tsx`, avec sidebar sombre, navigation verticale, vrai logo RentFlow, toggle dark/light, CTA vers `/sign-up` et `/sign-in`, et bascule visible entre espace proprietaire et espace locataire sur `/demo`.
-- Demo publique V1 : elle sert maintenant de modele visuel valide pour les prochaines refontes connectees.
-- Demo publique V1 : images locales fictives de biens dans `public/demo/properties`, cards cliquables, animations hover, spotlight colore local a la demo sauf sur les cards logements avec images, et actions rapides compactes en bas de page sous forme de pills icone + titre au hover/focus.
-- Demo publique V1 : les actions demo pointent vers `/sign-up`, jamais vers `/owner` ou `/tenant`.
+- Demo publique V2 : `/demo` simule les vraies pages avec query params `mode=owner|tenant` et `page=...` au lieu de pousser le visiteur vers les routes protegees.
+- Demo publique V2 : pages owner simulees dans `/demo` : dashboard, biens, detail logement, contrats, paiements, quittances, finances, declarations et locataires.
+- Demo publique V2 : pages tenant simulees dans `/demo` : dashboard, detail contrat, demandes au proprietaire et compte.
+- Demo publique V2 : donnees fictives centralisees dans `app/demo/demo-data.ts`, aucune donnee reelle, aucun Prisma, aucun `requireRole`, aucun Clerk obligatoire, aucune server action, aucune mutation metier et aucun provider.
+- Demo publique V2 : navigation dediee dans `app/demo/layout.tsx`, avec sidebar type app, navigation owner/tenant selon le mode, vrai logo RentFlow, toggle dark/light, toggle effets lumineux, CTA vers `/sign-up` et `/sign-in`, et bascule visible entre espace proprietaire et espace locataire.
+- Demo publique V2 : images locales fictives de biens dans `public/demo/properties`, cards cliquables, animations hover, spotlight des composants RentFlow sauf sur les cards logements avec images, et actions sensibles redirigees vers `/sign-up` comme actions simulees.
 - Pages connectees refondues en V1 UI : dashboard owner `/owner`, finances owner `/owner/finances`, liste logements `/owner/properties`, detail logement `/owner/properties/[id]`, detail contrat owner `/owner/properties/[id]/contracts/[contractId]` et dashboard tenant `/tenant`.
 - Refontes UI V1 : uniquement presentation et lisibilite ; aucun workflow metier, server action ou permission n'a ete modifie par ces refontes.
 - Modele SaaS proprietaire `FREE` / `PRO` / `SCALE` : `OwnerProfile.plan` existe avec `FREE` par defaut, le compte locataire reste gratuit, et le billing reel reste hors scope immediat.

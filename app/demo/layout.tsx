@@ -5,10 +5,12 @@ import {
   Building2,
   ClipboardList,
   Home,
+  LifeBuoy,
   LogIn,
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
+  ReceiptText,
   Sparkles,
   Sun,
   Users,
@@ -16,8 +18,14 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState, type ComponentType, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
+import {
+  Suspense,
+  useEffect,
+  useState,
+  type ComponentType,
+  type ReactNode,
+} from "react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -26,31 +34,75 @@ type DemoLayoutProps = {
   children: ReactNode;
 };
 
+type DemoMode = "owner" | "tenant";
+type ThemePreference = "dark" | "light";
+type SpotlightEffectsPreference = "on" | "off";
+
 type DemoNavLink = {
   href: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
 };
 
-type ThemePreference = "dark" | "light";
-
 const THEME_STORAGE_KEY = "rentflow-theme";
+const SPOTLIGHT_EFFECTS_STORAGE_KEY = "rentflow-spotlight-effects";
 
-const demoNavLinks: DemoNavLink[] = [
-  { href: "/demo", label: "Vue d'ensemble", icon: Home },
-  { href: "/demo/finances", label: "Finances", icon: BarChart3 },
-  { href: "/demo/properties", label: "Logements", icon: Building2 },
-  { href: "/demo/tenants", label: "Locataires", icon: Users },
-  { href: "/demo/declarations", label: "Declarations", icon: ClipboardList },
-  { href: "/pricing", label: "Plans", icon: Sparkles },
+const ownerNavLinks: DemoNavLink[] = [
+  {
+    href: "/demo?mode=owner&page=dashboard",
+    label: "Tableau de bord",
+    icon: Home,
+  },
+  { href: "/demo?mode=owner&page=properties", label: "Biens", icon: Building2 },
+  { href: "/demo?mode=owner&page=tenants", label: "Locataires", icon: Users },
+  {
+    href: "/demo?mode=owner&page=finances",
+    label: "Finances",
+    icon: BarChart3,
+  },
+  {
+    href: "/demo?mode=owner&page=declarations",
+    label: "Declarations",
+    icon: ClipboardList,
+  },
+  { href: "/support", label: "Support", icon: LifeBuoy },
 ];
 
-function isActivePath(pathname: string, href: string) {
-  if (href === "/demo") {
-    return pathname === href;
-  }
+const tenantNavLinks: DemoNavLink[] = [
+  {
+    href: "/demo?mode=tenant&page=dashboard",
+    label: "Tableau de bord",
+    icon: Home,
+  },
+  {
+    href: "/demo?mode=tenant&page=requests",
+    label: "Demandes",
+    icon: ReceiptText,
+  },
+  { href: "/demo?mode=tenant&page=account", label: "Mon compte", icon: Users },
+  { href: "/support", label: "Support", icon: LifeBuoy },
+];
 
-  return pathname === href || pathname.startsWith(`${href}/`);
+function getDemoMode(searchParams: URLSearchParams): DemoMode {
+  return searchParams.get("mode") === "tenant" ? "tenant" : "owner";
+}
+
+function getDemoPage(searchParams: URLSearchParams) {
+  return searchParams.get("page") ?? "dashboard";
+}
+
+function isActiveDemoLink(
+  linkHref: string,
+  mode: DemoMode,
+  currentPage: string,
+) {
+  const [, query = ""] = linkHref.split("?");
+  const params = new URLSearchParams(query);
+
+  return (
+    params.get("mode") === mode &&
+    (params.get("page") ?? "dashboard") === currentPage
+  );
 }
 
 function getStoredThemePreference(): ThemePreference {
@@ -67,15 +119,43 @@ function applyThemePreference(theme: ThemePreference) {
   document.documentElement.classList.toggle("dark", theme === "dark");
 }
 
-export default function DemoLayout({ children }: DemoLayoutProps) {
-  const pathname = usePathname();
+function getStoredSpotlightEffectsPreference(): SpotlightEffectsPreference {
+  if (typeof window === "undefined") {
+    return "on";
+  }
+
+  return window.localStorage.getItem(SPOTLIGHT_EFFECTS_STORAGE_KEY) === "off"
+    ? "off"
+    : "on";
+}
+
+function applySpotlightEffectsPreference(
+  preference: SpotlightEffectsPreference,
+) {
+  document.documentElement.dataset.spotlightEffects = preference;
+}
+
+function DemoLayoutContent({ children }: DemoLayoutProps) {
+  const searchParams = useSearchParams();
+  const mode = getDemoMode(searchParams);
+  const currentPage = getDemoPage(searchParams);
+  const navLinks = mode === "owner" ? ownerNavLinks : tenantNavLinks;
   const [theme, setTheme] = useState<ThemePreference>(getStoredThemePreference);
+  const [spotlightEffects, setSpotlightEffects] =
+    useState<SpotlightEffectsPreference>(getStoredSpotlightEffectsPreference);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const isDarkTheme = theme === "dark";
+  const areSpotlightEffectsEnabled = spotlightEffects === "on";
+  const topActionClassName =
+    "group/top-action inline-flex h-10 w-10 items-center justify-start gap-2 overflow-hidden rounded-full border border-border/80 bg-card/85 px-2.5 text-sm font-medium text-muted-foreground shadow-sm shadow-black/10 backdrop-blur transition-all duration-300 hover:w-56 hover:border-primary/45 hover:bg-primary/12 hover:text-foreground focus-visible:w-56 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
   useEffect(() => {
     applyThemePreference(theme);
   }, [theme]);
+
+  useEffect(() => {
+    applySpotlightEffectsPreference(spotlightEffects);
+  }, [spotlightEffects]);
 
   function toggleTheme() {
     setTheme((currentTheme) => {
@@ -85,6 +165,20 @@ export default function DemoLayout({ children }: DemoLayoutProps) {
       applyThemePreference(nextTheme);
 
       return nextTheme;
+    });
+  }
+
+  function toggleSpotlightEffects() {
+    setSpotlightEffects((currentPreference) => {
+      const nextPreference = currentPreference === "on" ? "off" : "on";
+
+      window.localStorage.setItem(
+        SPOTLIGHT_EFFECTS_STORAGE_KEY,
+        nextPreference,
+      );
+      applySpotlightEffectsPreference(nextPreference);
+
+      return nextPreference;
     });
   }
 
@@ -127,7 +221,7 @@ export default function DemoLayout({ children }: DemoLayoutProps) {
         <div
           className={cn(
             "mt-3 rounded-xl border bg-background/45",
-            isSidebarCollapsed ? "p-2" : "px-3 py-2.5",
+            isSidebarCollapsed ? "p-2" : "space-y-2 px-3 py-2.5",
           )}
         >
           <div
@@ -137,7 +231,7 @@ export default function DemoLayout({ children }: DemoLayoutProps) {
             )}
           >
             <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-              Démo
+              Demo
             </span>
             <span
               className={cn(
@@ -145,17 +239,31 @@ export default function DemoLayout({ children }: DemoLayoutProps) {
                 isSidebarCollapsed && "sr-only",
               )}
             >
-              Données fictives
+              Donnees fictives
             </span>
           </div>
+          <Link
+            className={cn(
+              "inline-flex text-xs font-medium text-primary hover:text-primary/80",
+              isSidebarCollapsed && "sr-only",
+            )}
+            href={mode === "owner" ? "/demo?mode=tenant" : "/demo?mode=owner"}
+          >
+            {mode === "owner"
+              ? "Voir l'espace locataire"
+              : "Voir l'espace proprietaire"}
+          </Link>
         </div>
 
         <div className="min-h-0 flex-1">
-          <nav aria-label="Navigation démo" className="mt-4">
+          <nav aria-label="Navigation demo" className="mt-4">
             <ul className="space-y-1">
-              {demoNavLinks.map((link) => {
+              {navLinks.map((link) => {
                 const Icon = link.icon;
-                const isActive = isActivePath(pathname, link.href);
+                const isExternalSupport = link.href === "/support";
+                const isActive =
+                  !isExternalSupport &&
+                  isActiveDemoLink(link.href, mode, currentPage);
 
                 return (
                   <li key={link.href}>
@@ -202,21 +310,21 @@ export default function DemoLayout({ children }: DemoLayoutProps) {
               isSidebarCollapsed && "sr-only",
             )}
           >
-            Prêt à gérer vos biens ?
+            Tester avec vos donnees
           </p>
           <div className={cn("grid gap-2", isSidebarCollapsed && "gap-1")}>
             <Link
-              aria-label="Créer un compte"
+              aria-label="Creer un compte"
               className={buttonVariants({
                 size: isSidebarCollapsed ? "icon" : "default",
               })}
               href="/sign-up"
-              title="Créer un compte"
+              title="Creer un compte"
             >
               {isSidebarCollapsed ? (
                 <UserPlus className="size-4" />
               ) : (
-                "Créer un compte"
+                "Creer un compte"
               )}
             </Link>
             <Link
@@ -241,8 +349,8 @@ export default function DemoLayout({ children }: DemoLayoutProps) {
       <button
         aria-label={
           isSidebarCollapsed
-            ? "Ouvrir la barre latérale"
-            : "Réduire la barre latérale"
+            ? "Ouvrir la barre laterale"
+            : "Reduire la barre laterale"
         }
         aria-pressed={isSidebarCollapsed}
         className={cn(
@@ -274,24 +382,18 @@ export default function DemoLayout({ children }: DemoLayoutProps) {
             <span>RentFlow</span>
           </Link>
           <div className="flex items-center gap-2">
-            <Link
-              className={buttonVariants({
-                size: "sm",
-              })}
-              href="/sign-up"
-            >
-              Créer un compte
+            <Link className={buttonVariants({ size: "sm" })} href="/sign-up">
+              Creer un compte
             </Link>
             <Link
               className={buttonVariants({
                 variant: "outline",
-                size: "sm",
-                className: "gap-1.5",
+                size: "icon-sm",
               })}
               href="/sign-in"
+              title="Se connecter"
             >
               <LogIn className="size-3.5" />
-              Se connecter
             </Link>
             <button
               aria-label={
@@ -311,19 +413,44 @@ export default function DemoLayout({ children }: DemoLayoutProps) {
                 <Moon className="size-3.5" />
               )}
             </button>
+            <button
+              aria-label={
+                areSpotlightEffectsEnabled
+                  ? "Desactiver les effets lumineux"
+                  : "Activer les effets lumineux"
+              }
+              aria-pressed={!areSpotlightEffectsEnabled}
+              className={buttonVariants({
+                variant: "outline",
+                size: "icon-sm",
+              })}
+              onClick={toggleSpotlightEffects}
+              type="button"
+            >
+              <Sparkles className="size-3.5" />
+            </button>
           </div>
         </div>
         <div className="border-t px-4 py-3">
           <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
             <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-1 font-medium text-primary">
-              Démo
+              Demo - donnees fictives
             </span>
-            <span className="text-muted-foreground">Données fictives</span>
+            <Link
+              className="font-medium text-primary"
+              href={mode === "owner" ? "/demo?mode=tenant" : "/demo?mode=owner"}
+            >
+              {mode === "owner"
+                ? "Voir l'espace locataire"
+                : "Voir l'espace proprietaire"}
+            </Link>
           </div>
-          <nav aria-label="Navigation démo mobile" className="overflow-x-auto">
+          <nav aria-label="Navigation demo mobile" className="overflow-x-auto">
             <ul className="flex min-w-max gap-2">
-              {demoNavLinks.map((link) => {
-                const isActive = isActivePath(pathname, link.href);
+              {navLinks.map((link) => {
+                const isActive =
+                  link.href !== "/support" &&
+                  isActiveDemoLink(link.href, mode, currentPage);
 
                 return (
                   <li key={link.href}>
@@ -354,29 +481,77 @@ export default function DemoLayout({ children }: DemoLayoutProps) {
             : "md:ml-72 md:w-[calc(100%-18rem)]",
         )}
       >
-        <div className="sticky top-4 z-30 mb-4 hidden justify-end md:flex">
+        <div className="sticky top-4 z-30 mb-4 hidden justify-end gap-2 md:flex">
+          <Link
+            className={topActionClassName}
+            href="/"
+            title="Retour presentation"
+          >
+            <Sparkles className="size-4 shrink-0 text-primary" />
+            <span className="whitespace-nowrap opacity-0 transition-opacity duration-300 group-hover/top-action:opacity-100 group-focus-visible/top-action:opacity-100">
+              Retour presentation
+            </span>
+          </Link>
           <button
             aria-label={
               isDarkTheme ? "Activer le mode clair" : "Activer le mode sombre"
             }
             aria-pressed={!isDarkTheme}
-            className={buttonVariants({
-              variant: "outline",
-              size: "icon",
-              className: "bg-card/85 shadow-sm shadow-black/10 backdrop-blur",
-            })}
+            className={topActionClassName}
             onClick={toggleTheme}
             type="button"
           >
             {isDarkTheme ? (
-              <Sun className="size-4" />
+              <Sun className="size-4 shrink-0 text-primary" />
             ) : (
-              <Moon className="size-4" />
+              <Moon className="size-4 shrink-0 text-primary" />
             )}
+            <span className="whitespace-nowrap opacity-0 transition-opacity duration-300 group-hover/top-action:opacity-100 group-focus-visible/top-action:opacity-100">
+              {isDarkTheme ? "Mode clair" : "Mode sombre"}
+            </span>
+          </button>
+          <button
+            aria-label={
+              areSpotlightEffectsEnabled
+                ? "Desactiver les effets lumineux"
+                : "Activer les effets lumineux"
+            }
+            aria-pressed={!areSpotlightEffectsEnabled}
+            className={topActionClassName}
+            onClick={toggleSpotlightEffects}
+            title={
+              areSpotlightEffectsEnabled
+                ? "Desactiver les effets lumineux"
+                : "Activer les effets lumineux"
+            }
+            type="button"
+          >
+            <Sparkles className="size-4 shrink-0 text-primary" />
+            <span className="whitespace-nowrap opacity-0 transition-opacity duration-300 group-hover/top-action:opacity-100 group-focus-visible/top-action:opacity-100">
+              {areSpotlightEffectsEnabled
+                ? "Effets lumineux off"
+                : "Effets lumineux on"}
+            </span>
           </button>
         </div>
         <div className="mx-auto w-full max-w-[1500px]">{children}</div>
       </main>
     </div>
+  );
+}
+
+export default function DemoLayout({ children }: DemoLayoutProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-background px-6 py-8 text-foreground">
+          <div className="mx-auto max-w-7xl rounded-xl border bg-card p-6 shadow-sm">
+            Chargement de la demo...
+          </div>
+        </div>
+      }
+    >
+      <DemoLayoutContent>{children}</DemoLayoutContent>
+    </Suspense>
   );
 }

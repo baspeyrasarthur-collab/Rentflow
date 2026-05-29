@@ -73,23 +73,65 @@ describe("public landing and demo entry path", () => {
 
   it("lets the demo switch between owner and tenant modes", () => {
     const demoSource = readWorkspaceFile("app/demo/page.tsx");
+    const demoLayoutSource = readWorkspaceFile("app/demo/layout.tsx");
 
+    expect(demoSource).toContain("Demo - donnees fictives");
     expect(demoSource).toContain("Voir l'espace locataire");
-    expect(demoSource).toContain("Voir l'espace propriétaire");
+    expect(demoSource).toContain("Voir l'espace proprietaire");
     expect(demoSource).toContain("/demo?mode=tenant");
-    expect(demoSource).toContain("Créer un compte");
+    expect(demoSource).toContain("Creer un compte");
     expect(demoSource).toContain("Se connecter");
-    expect(demoSource).toContain("Retour présentation");
+    expect(demoSource).toContain("Retour presentation");
+    expect(demoLayoutSource).toContain("/demo?mode=owner&page=properties");
+    expect(demoLayoutSource).toContain("/demo?mode=tenant&page=requests");
+    expect(demoLayoutSource).toContain("Demo - donnees fictives");
   });
 
-  it("shows fictive tenant dashboard content in the public demo", () => {
+  it("simulates the owner pages with fictive app data", () => {
     const demoSource = readWorkspaceFile("app/demo/page.tsx");
+    const demoDataSource = readWorkspaceFile("app/demo/demo-data.ts");
 
-    expect(demoSource).toContain("Déclarer mon loyer comme payé");
+    expect(demoSource).toContain("A faire maintenant");
+    expect(demoSource).toContain("Liste des biens");
+    expect(demoSource).toContain("Detail logement");
+    expect(demoSource).toContain("Contrats");
+    expect(demoSource).toContain("Paiements");
+    expect(demoSource).toContain("Quittances");
+    expect(demoSource).toContain("Resume financier");
+    expect(demoSource).toContain("Declarations");
+    expect(demoSource).toContain("Locataires actifs et demandes");
+    expect(demoDataSource).toContain("Appartement Canal");
+    expect(demoDataSource).toContain("Studio Republique");
+    expect(demoDataSource).toContain("Maison des Pins");
+    expect(demoDataSource).toContain("Lea Martin");
+    expect(demoDataSource).toContain("Hugo Bernard");
+    expect(demoDataSource).toContain("Camille Moreau");
+  });
+
+  it("shows fictive tenant dashboard and account pages in the public demo", () => {
+    const demoSource = readWorkspaceFile("app/demo/page.tsx");
+    const demoDataSource = readWorkspaceFile("app/demo/demo-data.ts");
+
+    expect(demoSource).toContain("Declarer un loyer paye");
     expect(demoSource).toContain("Mon logement");
-    expect(demoSource).toContain("Studio Canal Saint-Martin");
-    expect(demoSource).toContain("Demandes au propriétaire");
-    expect(demoSource).toContain("Ancien contrat");
+    expect(demoSource).toContain("Detail du contrat");
+    expect(demoSource).toContain("Demandes au proprietaire");
+    expect(demoSource).toContain("Mon compte");
+    expect(demoDataSource).toContain("Appartement Canal");
+    expect(demoDataSource).toContain("Arthur B.");
+  });
+
+  it("keeps demo actions simulated and away from protected app routes", () => {
+    const demoSource = readWorkspaceFile("app/demo/page.tsx");
+    const demoLayoutSource = readWorkspaceFile("app/demo/layout.tsx");
+
+    expect(demoSource).toContain("Action simulee");
+    expect(demoSource).toContain('href="/sign-up"');
+    expect(demoSource).not.toContain('"use server"');
+    expect(demoSource).not.toContain("requireOwnerAccess");
+    expect(demoSource).not.toContain("requireTenantAccess");
+    expect(demoLayoutSource).not.toContain('href="/owner');
+    expect(demoLayoutSource).not.toContain('href="/tenant');
   });
 
   it("documents the updated public entry path", () => {

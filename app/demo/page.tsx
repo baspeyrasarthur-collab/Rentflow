@@ -7,13 +7,13 @@ import {
   Building2,
   CheckCircle2,
   FileText,
-  Home,
   KeyRound,
   Plus,
   ReceiptText,
-  Repeat2,
   Send,
+  UserPlus,
   WalletCards,
+  Wrench,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -23,162 +23,207 @@ import {
   InfoAlert,
   PageHeader,
   SectionHeader,
+  SpotlightCard,
   StatCard,
   StatusBadge,
 } from "@/components/ui/rentflow";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
 import { cn } from "@/lib/utils";
 
-import { DemoActionPill, type DemoActionPillTone } from "./demo-action-pill";
-import { demoDashboardData } from "./demo-data";
-import { DemoSpotlightCard } from "./demo-spotlight-card";
+import { demoAppData } from "./demo-data";
+
+type DemoMode = "owner" | "tenant";
+type OwnerDemoPage =
+  | "dashboard"
+  | "properties"
+  | "property-detail"
+  | "contracts"
+  | "payments"
+  | "receipts"
+  | "finances"
+  | "declarations"
+  | "tenants";
+type TenantDemoPage = "dashboard" | "contract" | "requests" | "account";
+type BadgeTone =
+  | "default"
+  | "success"
+  | "info"
+  | "warning"
+  | "danger"
+  | "muted";
+type CardTone = "default" | "success" | "info" | "warning" | "danger";
 
 type DemoPageProps = {
   searchParams?: Promise<{
     mode?: string | string[];
+    page?: string | string[];
   }>;
 };
 
-type DemoMode = "owner" | "tenant";
-type Tone = "default" | "success" | "info" | "warning" | "danger";
-type BadgeTone = Tone | "muted";
+const ownerPages = new Set<OwnerDemoPage>([
+  "dashboard",
+  "properties",
+  "property-detail",
+  "contracts",
+  "payments",
+  "receipts",
+  "finances",
+  "declarations",
+  "tenants",
+]);
 
-const priorityIcons: Record<string, ReactNode> = {
-  declared_paid: <WalletCards className="size-5" />,
-  receipt: <ReceiptText className="size-5" />,
-  late_payment: <FileText className="size-5" />,
-  recurring_expenses: <Repeat2 className="size-5" />,
-};
+const tenantPages = new Set<TenantDemoPage>([
+  "dashboard",
+  "contract",
+  "requests",
+  "account",
+]);
 
-const quickActionIcons: Record<string, ReactNode> = {
-  "Ajouter un logement": <Plus className="size-5" />,
-  "Ajouter une depense": <FileText className="size-5" />,
-  "Voir les finances": <BarChart3 className="size-5" />,
-  "Generer une quittance": <ReceiptText className="size-5" />,
-};
-
-const quickActionTones: Record<string, DemoActionPillTone> = {
-  "Ajouter un logement": "info",
-  "Ajouter une depense": "success",
-  "Voir les finances": "default",
-  "Generer une quittance": "warning",
-};
-
-const demoToneSurfaceClasses: Record<Tone, string> = {
-  default: "border-primary/35 bg-primary/8",
-  success: "border-primary/45 bg-primary/12",
-  info: "border-ring/45 bg-ring/12",
-  warning: "border-chart-4/50 bg-chart-4/12",
-  danger: "border-destructive/50 bg-destructive/12",
-};
-
-const propertyVisualClasses: Record<string, string> = {
-  river: "from-primary/35 via-ring/15 to-background",
-  studio: "from-chart-4/30 via-primary/10 to-background",
-  house: "from-ring/30 via-secondary/35 to-background",
-};
-
-const tenantDemoActions = [
+const ownerQuickActions = [
   {
-    id: "declare-rent",
-    title: "Déclarer mon loyer comme payé",
-    description:
-      "Cette action apparaît avant l'échéance. Le propriétaire devra confirmer la réception.",
-    value: "980 €",
-    tone: "warning",
+    label: "Ajouter un logement",
+    href: "/demo?mode=owner&page=properties",
+    icon: <Plus className="size-5" />,
+    tone: "info",
+  },
+  {
+    label: "Mettre a jour les loyers",
+    href: "/demo?mode=owner&page=payments",
     icon: <WalletCards className="size-5" />,
-    actionLabel: "Créer un compte",
-  },
-  {
-    id: "receipt-ready",
-    title: "Quittance disponible",
-    description:
-      "La quittance de mai est prête et restera disponible dans l'historique.",
-    value: "1",
-    tone: "info",
-    icon: <ReceiptText className="size-5" />,
-    actionLabel: "Voir la démo",
-  },
-  {
-    id: "request-answer",
-    title: "Réponse propriétaire",
-    description:
-      "Votre demande de document a été traitée. Confirmez quand c'est clair.",
-    value: "Fait",
-    tone: "success",
-    icon: <Send className="size-5" />,
-    actionLabel: "Créer un compte",
-  },
-] as const;
-
-const tenantRecentPayments = [
-  {
-    label: "Loyer juin",
-    amount: "980 €",
-    status: "À déclarer bientôt",
     tone: "warning",
   },
   {
-    label: "Loyer mai",
-    amount: "980 €",
-    status: "Confirmé par le propriétaire",
+    label: "Generer une quittance",
+    href: "/demo?mode=owner&page=receipts",
+    icon: <ReceiptText className="size-5" />,
     tone: "success",
   },
   {
-    label: "Charges avril",
-    amount: "120 €",
-    status: "Déclaré payé",
+    label: "Modifier les contrats",
+    href: "/demo?mode=owner&page=contracts",
+    icon: <FileText className="size-5" />,
+    tone: "default",
+  },
+  {
+    label: "Inviter un locataire",
+    href: "/demo?mode=owner&page=tenants",
+    icon: <UserPlus className="size-5" />,
     tone: "info",
   },
+  {
+    label: "Exporter mes finances",
+    href: "/demo?mode=owner&page=finances",
+    icon: <BarChart3 className="size-5" />,
+    tone: "default",
+  },
 ] as const;
+
+const tenantQuickActions = [
+  {
+    label: "Details contrat",
+    href: "/demo?mode=tenant&page=contract",
+    icon: <FileText className="size-5" />,
+    tone: "info",
+  },
+  {
+    label: "Mettre fin a un contrat",
+    href: "/sign-up",
+    icon: <KeyRound className="size-5" />,
+    tone: "warning",
+  },
+  {
+    label: "Declarer un loyer paye",
+    href: "/sign-up",
+    icon: <WalletCards className="size-5" />,
+    tone: "success",
+  },
+  {
+    label: "Demande proprietaire",
+    href: "/demo?mode=tenant&page=requests",
+    icon: <Send className="size-5" />,
+    tone: "default",
+  },
+] as const;
+
+function getOne(value?: string | string[]) {
+  return Array.isArray(value) ? value[0] : value;
+}
 
 function getDemoMode(mode?: string | string[]): DemoMode {
-  const resolvedMode = Array.isArray(mode) ? mode[0] : mode;
-
-  return resolvedMode === "tenant" ? "tenant" : "owner";
+  return getOne(mode) === "tenant" ? "tenant" : "owner";
 }
 
-function ModeSwitch({ mode }: { mode: DemoMode }) {
+function getOwnerPage(page?: string | string[]): OwnerDemoPage {
+  const resolvedPage = getOne(page);
+
+  return resolvedPage && ownerPages.has(resolvedPage as OwnerDemoPage)
+    ? (resolvedPage as OwnerDemoPage)
+    : "dashboard";
+}
+
+function getTenantPage(page?: string | string[]): TenantDemoPage {
+  const resolvedPage = getOne(page);
+
+  return resolvedPage && tenantPages.has(resolvedPage as TenantDemoPage)
+    ? (resolvedPage as TenantDemoPage)
+    : "dashboard";
+}
+
+function getPageTitle(mode: DemoMode, page: OwnerDemoPage | TenantDemoPage) {
+  if (mode === "tenant") {
+    const tenantTitles: Record<TenantDemoPage, string> = {
+      account: "Mon compte",
+      contract: "Detail du contrat",
+      dashboard: "Tableau de bord locataire",
+      requests: "Demandes au proprietaire",
+    };
+
+    return tenantTitles[page as TenantDemoPage];
+  }
+
+  const ownerTitles: Record<OwnerDemoPage, string> = {
+    contracts: "Contrats",
+    dashboard: "Tableau de bord proprietaire",
+    declarations: "Declarations",
+    finances: "Finances",
+    payments: "Paiements",
+    properties: "Biens",
+    "property-detail": "Detail logement",
+    receipts: "Quittances",
+    tenants: "Locataires",
+  };
+
+  return ownerTitles[page as OwnerDemoPage];
+}
+
+function DemoHeader({
+  mode,
+  page,
+}: {
+  mode: DemoMode;
+  page: OwnerDemoPage | TenantDemoPage;
+}) {
   const targetMode = mode === "owner" ? "tenant" : "owner";
-  const label =
-    mode === "owner" ? "Voir l'espace locataire" : "Voir l'espace propriétaire";
 
-  return (
-    <Link
-      className={buttonVariants({ variant: "outline" })}
-      href={targetMode === "tenant" ? "/demo?mode=tenant" : "/demo"}
-    >
-      {mode === "owner" ? (
-        <KeyRound className="size-4" />
-      ) : (
-        <Building2 className="size-4" />
-      )}
-      {label}
-    </Link>
-  );
-}
-
-function DemoHeader({ mode }: { mode: DemoMode }) {
   return (
     <PageHeader
-      eyebrow="Démo publique - données fictives"
-      title={
-        mode === "owner"
-          ? "Tableau de bord propriétaire démo"
-          : "Espace locataire démo"
-      }
-      description={
-        mode === "owner"
-          ? "Voici comment RentFlow guide un propriétaire avec des données fictives."
-          : "Voici comment RentFlow guide un locataire avec un logement, un contrat et des actions fictives."
-      }
+      eyebrow="Demo - donnees fictives"
+      title={getPageTitle(mode, page)}
+      description="Cette demo reprend l'apparence des vraies pages RentFlow avec des donnees fictives et des actions simulees."
       actions={
         <>
           <Link className={buttonVariants({ variant: "outline" })} href="/">
             <ArrowLeft className="size-4" />
-            Retour présentation
+            Retour presentation
           </Link>
-          <ModeSwitch mode={mode} />
+          <Link
+            className={buttonVariants({ variant: "outline" })}
+            href={`/demo?mode=${targetMode}`}
+          >
+            {mode === "owner"
+              ? "Voir l'espace locataire"
+              : "Voir l'espace proprietaire"}
+          </Link>
           <Link
             className={buttonVariants({ variant: "outline" })}
             href="/sign-in"
@@ -186,7 +231,7 @@ function DemoHeader({ mode }: { mode: DemoMode }) {
             Se connecter
           </Link>
           <Link className={buttonVariants()} href="/sign-up">
-            Créer un compte
+            Creer un compte
           </Link>
         </>
       }
@@ -194,88 +239,176 @@ function DemoHeader({ mode }: { mode: DemoMode }) {
   );
 }
 
-function PropertyVisual({
+function DemoNotice() {
+  return (
+    <InfoAlert title="Demo - donnees fictives">
+      Les actions sont simulees. Aucun paiement, aucune quittance, aucune
+      invitation et aucune donnee reelle ne sont crees depuis cette demo.
+    </InfoAlert>
+  );
+}
+
+function PropertyImage({
   alt,
   imageSrc,
-  variant,
+  compact = false,
 }: {
   alt: string;
-  imageSrc?: string;
-  variant: string;
+  imageSrc: string;
+  compact?: boolean;
 }) {
-  if (imageSrc) {
-    return (
-      <div className="relative h-32 overflow-hidden bg-muted">
-        <Image
-          alt={alt}
-          className="object-cover transition duration-500 group-hover:scale-105"
-          fill
-          sizes="(min-width: 1024px) 33vw, 100vw"
-          src={imageSrc}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/55 via-background/10 to-transparent" />
-        <div className="absolute left-6 top-6 flex size-11 items-center justify-center rounded-xl border border-white/15 bg-background/45 text-primary backdrop-blur-sm">
-          <Building2 className="size-5" />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div
       className={cn(
-        "relative h-32 overflow-hidden bg-gradient-to-br",
-        propertyVisualClasses[variant] ?? propertyVisualClasses.river,
+        "relative overflow-hidden bg-muted",
+        compact ? "h-36" : "h-48",
       )}
     >
-      <div className="absolute inset-x-6 bottom-0 h-16 rounded-t-2xl border border-white/10 bg-background/35 shadow-2xl shadow-black/30" />
-      <div className="absolute right-6 top-6 size-16 rounded-full border border-white/10 bg-white/10" />
-      <div className="absolute left-6 top-6 flex size-11 items-center justify-center rounded-xl border border-white/15 bg-background/35 text-primary">
-        <Building2 className="size-5" />
-      </div>
+      <Image
+        alt={alt}
+        className="object-cover transition duration-500 group-hover:scale-105"
+        fill
+        sizes="(min-width: 1024px) 33vw, 100vw"
+        src={imageSrc}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-background/55 via-background/5 to-transparent" />
     </div>
   );
 }
 
-function OwnerDemoContent() {
-  const { summary } = demoDashboardData;
+function QuickActionGrid({
+  actions,
+}: {
+  actions: ReadonlyArray<{
+    href: string;
+    icon: ReactNode;
+    label: string;
+    tone: CardTone;
+  }>;
+}) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      {actions.map((action) => (
+        <ActionCard
+          actionLabel={
+            action.href === "/sign-up"
+              ? "Action simulee"
+              : "Ouvrir dans la demo"
+          }
+          description={
+            action.href === "/sign-up"
+              ? "Disponible apres creation du compte."
+              : "Navigation interne dans la demo."
+          }
+          href={action.href}
+          icon={action.icon}
+          key={action.label}
+          title={action.label}
+          tone={action.tone}
+        />
+      ))}
+    </div>
+  );
+}
+
+function PaymentRow({
+  payment,
+}: {
+  payment: (typeof demoAppData.owner.payments)[number];
+}) {
+  return (
+    <SpotlightCard tone={payment.statusTone as CardTone}>
+      <article className="h-full rounded-xl border border-border bg-card p-5 shadow-sm shadow-black/10">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <StatusBadge tone={payment.statusTone as BadgeTone}>
+              {payment.status}
+            </StatusBadge>
+            <h3 className="mt-3 font-semibold tracking-normal">
+              {payment.label} - {payment.propertyName}
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {payment.tenantName} - echeance {payment.dueDate} - {payment.kind}
+            </p>
+          </div>
+          <p className="text-xl font-semibold">
+            {formatMoney(payment.amountInCents)}
+          </p>
+        </div>
+      </article>
+    </SpotlightCard>
+  );
+}
+
+function OwnerDashboardDemo() {
+  const { owner } = demoAppData;
 
   return (
     <>
-      <DemoSpotlightCard tone="info">
-        <InfoAlert title="Démo publique">
-          Données fictives, lecture seule, aucune action réelle. Les boutons de
-          la démo redirigent vers la création de compte.
-        </InfoAlert>
-      </DemoSpotlightCard>
+      <DemoNotice />
 
       <section className="space-y-4">
         <SectionHeader
-          title="À faire maintenant"
-          description="Les priorités qu'un propriétaire verrait remonter dans RentFlow."
+          title="A faire maintenant"
+          description="Les actions prioritaires remontent comme dans le vrai dashboard owner."
         />
-        <div className="grid gap-4 xl:grid-cols-4">
-          {demoDashboardData.priorityActions.map((action) => (
-            <DemoSpotlightCard
-              href="/sign-up"
-              key={action.id}
-              tone={action.tone as Tone}
-            >
-              <ActionCard
-                className="h-full"
-                description={action.description}
-                icon={priorityIcons[action.id]}
-                title={action.title}
-                tone={action.tone as Tone}
-                value={action.value}
-              >
-                <span className="inline-flex items-center gap-2 text-sm font-medium text-primary">
-                  {action.actionLabel}
-                  <ArrowRight className="size-4" />
-                </span>
-              </ActionCard>
-            </DemoSpotlightCard>
-          ))}
+        <div className="grid gap-4 lg:grid-cols-3">
+          <ActionCard
+            actionLabel="Ouvrir les paiements"
+            description="Hugo Bernard a declare un loyer paye. Confirmez seulement apres reception reelle."
+            href="/demo?mode=owner&page=payments"
+            icon={<WalletCards className="size-5" />}
+            title="Paiement a confirmer"
+            tone="warning"
+            value={1}
+          />
+          <ActionCard
+            actionLabel="Ouvrir les quittances"
+            description="Une quittance demandee attend une generation fictive."
+            href="/demo?mode=owner&page=receipts"
+            icon={<ReceiptText className="size-5" />}
+            title="Quittance a generer"
+            tone="info"
+            value={1}
+          />
+          <ActionCard
+            actionLabel="Ouvrir la demande"
+            description="Une demande locataire ouverte attend une reponse."
+            href="/demo?mode=owner&page=tenants"
+            icon={<Send className="size-5" />}
+            title="Demande locataire"
+            tone="success"
+            value={3}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <SectionHeader
+          title="Recapitulatif du mois"
+          description={`Vue fictive du mois de ${owner.monthLabel}.`}
+        />
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            icon={<CheckCircle2 className="size-5" />}
+            label="Loyers confirmes"
+            value={formatMoney(owner.summary.confirmedRentInCents)}
+          />
+          <StatCard
+            icon={<WalletCards className="size-5" />}
+            label="A encaisser"
+            value={formatMoney(owner.summary.pendingRentInCents)}
+          />
+          <StatCard
+            icon={<FileText className="size-5" />}
+            label="Sorties connues"
+            value={formatMoney(owner.summary.outgoingInCents)}
+          />
+          <StatCard
+            icon={<BarChart3 className="size-5" />}
+            label="Cash-flow estime"
+            value={formatSignedMoney(owner.summary.cashFlowInCents)}
+          />
         </div>
       </section>
 
@@ -284,114 +417,42 @@ function OwnerDemoContent() {
           action={
             <Link
               className={buttonVariants({ variant: "outline", size: "sm" })}
-              href="/demo/finances"
-            >
-              Voir les finances
-            </Link>
-          }
-          description={`Vue fictive du mois de ${demoDashboardData.monthLabel}.`}
-          title="Récapitulatif du mois"
-        />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <DemoSpotlightCard tone="success">
-            <StatCard
-              className="h-full border-primary/70 bg-primary/26 shadow-primary/15"
-              icon={<CheckCircle2 className="size-5" />}
-              label="Loyers encaissés"
-              value={formatMoney(summary.collectedRentInCents)}
-            />
-          </DemoSpotlightCard>
-          <DemoSpotlightCard tone="warning">
-            <StatCard
-              className="h-full border-chart-4/75 bg-chart-4/26 shadow-chart-4/15"
-              icon={<WalletCards className="size-5" />}
-              label="À encaisser"
-              value={formatMoney(summary.remainingRentInCents)}
-            />
-          </DemoSpotlightCard>
-          <DemoSpotlightCard tone="danger">
-            <StatCard
-              className="h-full border-destructive/70 bg-destructive/24 shadow-destructive/15"
-              icon={<FileText className="size-5" />}
-              label="Sorties"
-              value={formatMoney(summary.outgoingAmountInCents)}
-            />
-          </DemoSpotlightCard>
-          <DemoSpotlightCard tone="success">
-            <StatCard
-              className="h-full border-primary/80 bg-primary/30 shadow-primary/20"
-              icon={<BarChart3 className="size-5" />}
-              label="Cash-flow estimé"
-              value={formatSignedMoney(summary.cashFlowInCents)}
-            />
-          </DemoSpotlightCard>
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <SectionHeader
-          action={
-            <Link
-              className={buttonVariants({ variant: "outline", size: "sm" })}
-              href="/demo/properties"
+              href="/demo?mode=owner&page=properties"
             >
               Voir tous les biens
             </Link>
           }
-          description="Trois logements fictifs avec les signaux essentiels."
           title="Mes biens"
+          description="Les cards logement reprennent le comportement de l'app : bloc cliquable, image sans spotlight, zoom conserve."
         />
         <div className="grid gap-4 lg:grid-cols-3">
-          {demoDashboardData.properties.map((property) => (
+          {owner.properties.map((property) => (
             <Link
-              className="group block h-full overflow-hidden rounded-xl border border-primary/35 bg-primary/8 text-card-foreground shadow-sm shadow-black/10 ring-1 ring-white/[0.02] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.015] hover:border-primary/65 hover:bg-primary/10 hover:shadow-xl hover:shadow-black/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              href="/sign-up"
+              className="group block h-full overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm shadow-black/10 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-primary/55 hover:shadow-xl hover:shadow-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              href="/demo?mode=owner&page=property-detail"
               key={property.id}
             >
-              <PropertyVisual
+              <PropertyImage
                 alt={`${property.name} - ${property.city}`}
+                compact
                 imageSrc={property.imageSrc}
-                variant={property.visualVariant}
               />
-              <div className="space-y-5 p-5">
+              <div className="space-y-4 p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <h3 className="truncate text-lg font-semibold tracking-normal">
                       {property.name}
                     </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {property.city} - {property.type} -{" "}
-                      {property.surfaceLabel}
+                      {property.city} - {property.type} - {property.surface}
                     </p>
                   </div>
                   <StatusBadge tone={property.statusTone as BadgeTone}>
                     {property.status}
                   </StatusBadge>
                 </div>
-
-                <dl className="grid grid-cols-3 gap-3 text-sm">
-                  <div>
-                    <dt className="text-muted-foreground">Contrats</dt>
-                    <dd className="mt-1 font-medium">
-                      {property.contractsCount}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">À suivre</dt>
-                    <dd className="mt-1 font-medium">
-                      {property.watchPaymentsCount}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">Quittances</dt>
-                    <dd className="mt-1 font-medium">
-                      {property.availableReceiptsCount}
-                    </dd>
-                  </div>
-                </dl>
-
-                <span className="inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors group-hover:text-primary/80">
-                  Tester avec mon compte
+                <span className="inline-flex items-center gap-2 text-sm font-medium text-primary">
+                  Voir detail
                   <ArrowRight className="size-4" />
                 </span>
               </div>
@@ -401,46 +462,227 @@ function OwnerDemoContent() {
       </section>
 
       <section className="space-y-4">
-        <SectionHeader
-          description="Trois événements fictifs pour illustrer le fil de suivi."
-          title="Activité récente"
-        />
-        <div className="grid gap-4 lg:grid-cols-3">
-          {demoDashboardData.recentActivity.map((activity) => (
-            <DemoSpotlightCard key={activity.id} tone={activity.tone as Tone}>
-              <article
-                className={cn(
-                  "h-full rounded-xl border p-5 text-card-foreground shadow-sm shadow-black/10",
-                  demoToneSurfaceClasses[activity.tone as Tone],
-                )}
-              >
-                <StatusBadge tone={activity.tone as BadgeTone}>
-                  {activity.when}
-                </StatusBadge>
-                <h3 className="mt-4 font-semibold tracking-normal">
-                  {activity.title}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {activity.description}
-                </p>
-              </article>
-            </DemoSpotlightCard>
-          ))}
-        </div>
+        <SectionHeader title="Actions rapides" />
+        <QuickActionGrid actions={ownerQuickActions} />
       </section>
 
       <section className="space-y-4">
+        <SectionHeader title="Activite recente" />
+        <div className="grid gap-4 lg:grid-cols-3">
+          {owner.recentActivity.map((activity) => (
+            <SpotlightCard key={activity} tone="info">
+              <article className="h-full rounded-xl border border-ring/35 bg-ring/10 p-5">
+                <CheckCircle2 className="size-5 text-ring" />
+                <p className="mt-3 font-medium">{activity}</p>
+              </article>
+            </SpotlightCard>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+function OwnerPropertiesDemo() {
+  const { owner } = demoAppData;
+
+  return (
+    <>
+      <DemoNotice />
+      <section className="space-y-4">
         <SectionHeader
-          description="Raccourcis fictifs vers les actions clés."
-          title="Actions rapides"
+          action={
+            <Link className={buttonVariants()} href="/sign-up">
+              Ajouter un logement
+            </Link>
+          }
+          title="Liste des biens"
+          description="Trois logements fictifs, avec image, statut, loyer et chemin vers le detail."
         />
-        <div className="flex flex-wrap gap-3">
-          {demoDashboardData.quickActions.map((action) => (
-            <DemoActionPill
-              icon={quickActionIcons[action]}
-              key={action}
-              label={action}
-              tone={quickActionTones[action] ?? "default"}
+        <div className="grid gap-4 lg:grid-cols-3">
+          {owner.properties.map((property) => (
+            <Link
+              className="group block overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-primary/45 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              href="/demo?mode=owner&page=property-detail"
+              key={property.id}
+            >
+              <PropertyImage alt={property.name} imageSrc={property.imageSrc} />
+              <div className="space-y-5 p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-lg font-semibold">{property.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {property.address} - {property.city}
+                    </p>
+                  </div>
+                  <StatusBadge tone={property.statusTone as BadgeTone}>
+                    {property.status}
+                  </StatusBadge>
+                </div>
+                <dl className="grid gap-3 text-sm sm:grid-cols-3">
+                  <div>
+                    <dt className="text-muted-foreground">Loyer</dt>
+                    <dd className="font-medium">
+                      {formatMoney(property.rentInCents)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground">Charges</dt>
+                    <dd className="font-medium">
+                      {formatMoney(property.chargesInCents)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground">Quittances</dt>
+                    <dd className="font-medium">{property.receiptsReady}</dd>
+                  </div>
+                </dl>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+function OwnerPropertyDetailDemo() {
+  const property = demoAppData.owner.properties[0];
+
+  return (
+    <>
+      <DemoNotice />
+      <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <article className="group overflow-hidden rounded-xl border bg-card shadow-sm">
+          <PropertyImage alt={property.name} imageSrc={property.imageSrc} />
+          <div className="space-y-4 p-5">
+            <StatusBadge tone={property.statusTone as BadgeTone}>
+              {property.status}
+            </StatusBadge>
+            <h2 className="text-2xl font-semibold tracking-normal">
+              {property.name}
+            </h2>
+            <p className="text-muted-foreground">
+              {property.address} - {property.city}
+            </p>
+          </div>
+        </article>
+        <section className="space-y-4">
+          <SectionHeader title="Synthese logement" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <StatCard label="Type" value={property.type} />
+            <StatCard label="Surface" value={property.surface} />
+            <StatCard label="Fiscalite" value={property.fiscalType} />
+            <StatCard
+              label="Total mensuel"
+              value={formatMoney(
+                property.rentInCents + property.chargesInCents,
+              )}
+            />
+          </div>
+        </section>
+      </section>
+      <section className="space-y-4">
+        <SectionHeader title="Contrats lies" />
+        <div className="grid gap-4 lg:grid-cols-2">
+          <ActionCard
+            actionLabel="Voir contrats"
+            description="Bail habitation meuble - locataire Lea Martin - lecture fictive."
+            href="/demo?mode=owner&page=contracts"
+            icon={<FileText className="size-5" />}
+            title="Contrat actif"
+            tone="success"
+          />
+          <ActionCard
+            actionLabel="Suivre paiements"
+            description="Paiements recents et quittances du logement."
+            href="/demo?mode=owner&page=payments"
+            icon={<WalletCards className="size-5" />}
+            title="Paiements recents"
+            tone="info"
+          />
+        </div>
+      </section>
+    </>
+  );
+}
+
+function OwnerContractsDemo() {
+  return (
+    <>
+      <DemoNotice />
+      <section className="space-y-4">
+        <SectionHeader title="Contrats actifs et brouillons" />
+        <div className="grid gap-4 lg:grid-cols-3">
+          {demoAppData.owner.properties.map((property) => (
+            <SpotlightCard key={property.id} tone="info">
+              <article className="h-full rounded-xl border bg-card p-5">
+                <StatusBadge tone={property.statusTone as BadgeTone}>
+                  {property.status}
+                </StatusBadge>
+                <h3 className="mt-4 font-semibold">{property.name}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {property.contracts} contrat(s) - {property.type}
+                </p>
+                <Link
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "sm" }),
+                    "mt-5",
+                  )}
+                  href="/sign-up"
+                >
+                  Action simulee
+                </Link>
+              </article>
+            </SpotlightCard>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+function OwnerPaymentsDemo() {
+  return (
+    <>
+      <DemoNotice />
+      <section className="space-y-4">
+        <SectionHeader
+          title="Paiements"
+          description="Un paiement declare paye n'est pas compte comme recu tant que le proprietaire ne confirme pas."
+        />
+        <div className="grid gap-4 lg:grid-cols-2">
+          {demoAppData.owner.payments.map((payment) => (
+            <PaymentRow key={payment.id} payment={payment} />
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+function OwnerReceiptsDemo() {
+  return (
+    <>
+      <DemoNotice />
+      <section className="space-y-4">
+        <SectionHeader title="Quittances" />
+        <div className="grid gap-4 lg:grid-cols-3">
+          {demoAppData.owner.receipts.map((receipt) => (
+            <ActionCard
+              actionLabel={
+                receipt.status === "Demandee" ? "Generer (demo)" : "Voir"
+              }
+              description={`${receipt.tenantName} - ${receipt.propertyName} - ${receipt.month}`}
+              href={
+                receipt.status === "Demandee"
+                  ? "/sign-up"
+                  : "/demo?mode=owner&page=receipts"
+              }
+              icon={<ReceiptText className="size-5" />}
+              key={receipt.id}
+              title={receipt.status}
+              tone={receipt.statusTone as CardTone}
             />
           ))}
         </div>
@@ -449,182 +691,486 @@ function OwnerDemoContent() {
   );
 }
 
-function TenantPropertyPreview() {
-  return (
-    <Link
-      className="group block overflow-hidden rounded-xl border border-ring/35 bg-ring/8 shadow-sm shadow-black/10 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-ring/65 hover:shadow-xl hover:shadow-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      href="/sign-up"
-    >
-      <div className="relative h-40 overflow-hidden bg-gradient-to-br from-ring/25 via-primary/10 to-background">
-        <div className="absolute inset-x-8 bottom-0 h-20 rounded-t-2xl border border-white/10 bg-background/35 shadow-2xl shadow-black/25 transition duration-500 group-hover:scale-105" />
-        <div className="absolute left-6 top-6 flex size-12 items-center justify-center rounded-xl border border-white/15 bg-background/40 text-ring">
-          <Home className="size-5" />
-        </div>
-      </div>
-      <div className="space-y-4 p-5">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-semibold tracking-normal">
-              Studio Canal Saint-Martin
-            </h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Paris - Contrat actif - paiement le 5
-            </p>
-          </div>
-          <StatusBadge tone="success">Actif</StatusBadge>
-        </div>
-        <div className="grid gap-3 text-sm sm:grid-cols-3">
-          <div>
-            <p className="text-muted-foreground">Loyer</p>
-            <p className="mt-1 font-medium">860 €</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Charges</p>
-            <p className="mt-1 font-medium">120 €</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Total</p>
-            <p className="mt-1 font-medium">980 €</p>
-          </div>
-        </div>
-        <span className="inline-flex items-center gap-2 text-sm font-medium text-ring">
-          Voir le contrat dans mon espace
-          <ArrowRight className="size-4" />
-        </span>
-      </div>
-    </Link>
-  );
-}
+function OwnerFinancesDemo() {
+  const { owner } = demoAppData;
 
-function TenantDemoContent() {
   return (
     <>
-      <DemoSpotlightCard tone="info">
-        <InfoAlert title="Démo publique">
-          Données locataires fictives, lecture seule. Les boutons sensibles de
-          la démo vous invitent à créer un compte pour tester RentFlow.
-        </InfoAlert>
-      </DemoSpotlightCard>
-
+      <DemoNotice />
       <section className="space-y-4">
-        <SectionHeader
-          title="À faire maintenant"
-          description="Les actions importantes que RentFlow ferait remonter côté locataire."
-        />
-        <div className="grid gap-4 lg:grid-cols-3">
-          {tenantDemoActions.map((action) => (
-            <DemoSpotlightCard
-              href="/sign-up"
-              key={action.id}
-              tone={action.tone as Tone}
-            >
-              <ActionCard
-                className="h-full"
-                description={action.description}
-                icon={action.icon}
-                title={action.title}
-                tone={action.tone as Tone}
-                value={action.value}
-              >
-                <span className="inline-flex items-center gap-2 text-sm font-medium text-primary">
-                  {action.actionLabel}
-                  <ArrowRight className="size-4" />
-                </span>
-              </ActionCard>
-            </DemoSpotlightCard>
-          ))}
+        <SectionHeader title="Resume financier" />
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            label="Loyers confirmes"
+            value={formatMoney(owner.summary.confirmedRentInCents)}
+          />
+          <StatCard
+            label="Sorties connues"
+            value={formatMoney(owner.summary.outgoingInCents)}
+          />
+          <StatCard
+            label="Cash-flow estime"
+            value={formatSignedMoney(owner.summary.cashFlowInCents)}
+          />
+          <StatCard
+            label="Biens inclus"
+            value={owner.summary.propertiesCount}
+          />
         </div>
       </section>
-
-      <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-4">
-          <SectionHeader
-            title="Mon logement"
-            description="Un aperçu compact du logement et du contrat actif."
-          />
-          <TenantPropertyPreview />
-        </div>
-
-        <div className="space-y-4">
-          <SectionHeader
-            title="Paiements récents"
-            description="Des statuts clairs sans confondre déclaration et réception."
-          />
-          <div className="space-y-3">
-            {tenantRecentPayments.map((payment) => (
-              <DemoSpotlightCard
-                key={payment.label}
-                tone={payment.tone as Tone}
+      <section className="grid gap-4 lg:grid-cols-2">
+        <details className="rounded-xl border bg-card p-5">
+          <summary className="cursor-pointer font-semibold">
+            Sorties par categorie
+          </summary>
+          <div className="mt-4 divide-y">
+            {owner.expenses.map((expense) => (
+              <div
+                className="flex items-center justify-between py-3 text-sm"
+                key={expense.id}
               >
-                <article
-                  className={cn(
-                    "rounded-xl border p-4 shadow-sm shadow-black/10",
-                    demoToneSurfaceClasses[payment.tone as Tone],
-                  )}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="font-medium tracking-normal">
-                        {payment.label}
-                      </h3>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {payment.status}
-                      </p>
-                    </div>
-                    <p className="font-semibold">{payment.amount}</p>
-                  </div>
-                </article>
-              </DemoSpotlightCard>
+                <span>{expense.category}</span>
+                <span className="font-medium">
+                  {formatMoney(expense.amountInCents)}
+                </span>
+              </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-3">
-        <DemoSpotlightCard tone="info">
-          <article className="h-full rounded-xl border border-ring/45 bg-ring/10 p-5">
-            <ReceiptText className="size-5 text-ring" />
-            <h3 className="mt-4 font-semibold tracking-normal">Quittances</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              PDFs disponibles, demandes en cours et historique consultable.
-            </p>
-          </article>
-        </DemoSpotlightCard>
-        <DemoSpotlightCard href="/sign-up" tone="success">
-          <article className="h-full rounded-xl border border-primary/45 bg-primary/10 p-5">
-            <Send className="size-5 text-primary" />
-            <h3 className="mt-4 font-semibold tracking-normal">
-              Demandes au propriétaire
-            </h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Créez une demande simple, puis suivez sa réponse dans RentFlow.
-            </p>
-          </article>
-        </DemoSpotlightCard>
-        <DemoSpotlightCard tone="default">
-          <article className="h-full rounded-xl border border-white/10 bg-card/70 p-5">
-            <FileText className="size-5 text-primary" />
-            <h3 className="mt-4 font-semibold tracking-normal">
-              Ancien contrat
-            </h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Les contrats terminés restent visibles, séparés du logement actif.
-            </p>
-          </article>
-        </DemoSpotlightCard>
+        </details>
+        <details className="rounded-xl border bg-card p-5">
+          <summary className="cursor-pointer font-semibold">
+            Depenses detaillees
+          </summary>
+          <div className="mt-4 divide-y">
+            {owner.expenses.map((expense) => (
+              <div
+                className="flex items-center justify-between py-3 text-sm"
+                key={expense.id}
+              >
+                <span>{expense.label}</span>
+                <span className="font-medium">
+                  {formatMoney(expense.amountInCents)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </details>
       </section>
     </>
   );
 }
 
+function OwnerDeclarationsDemo() {
+  const { declarations } = demoAppData.owner;
+
+  return (
+    <>
+      <DemoNotice />
+      <InfoAlert title="Preparation fiscale fictive" tone="warning">
+        RentFlow aide a preparer des donnees a verifier, mais ne genere pas de
+        declaration officielle.
+      </InfoAlert>
+      <section className="space-y-4">
+        <SectionHeader title="Donnees a completer" />
+        <div className="grid gap-4 lg:grid-cols-2">
+          {declarations.missingItems.map((item) => (
+            <ActionCard
+              actionLabel="Voir le logement"
+              description="Lien direct fictif vers l'endroit ou corriger la donnee dans l'app reelle."
+              href="/demo?mode=owner&page=property-detail"
+              icon={<Building2 className="size-5" />}
+              key={item}
+              title={item}
+              tone="warning"
+            />
+          ))}
+        </div>
+      </section>
+      <section className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+        <StatCard
+          label={`Montant prepare ${declarations.year}`}
+          value={formatMoney(declarations.preparedIncomeInCents)}
+        />
+        <details className="rounded-xl border bg-card p-5">
+          <summary className="cursor-pointer font-semibold">
+            Conseils personnalises
+          </summary>
+          <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+            {declarations.advice.map((advice) => (
+              <li key={advice}>{advice}</li>
+            ))}
+          </ul>
+        </details>
+      </section>
+    </>
+  );
+}
+
+function OwnerTenantsDemo() {
+  const { owner } = demoAppData;
+
+  return (
+    <>
+      <DemoNotice />
+      <section className="space-y-4">
+        <SectionHeader title="Locataires actifs et demandes" />
+        <div className="grid gap-4 lg:grid-cols-3">
+          {owner.tenants.map((tenant) => (
+            <SpotlightCard key={tenant.id} tone={tenant.statusTone as CardTone}>
+              <article className="h-full rounded-xl border bg-card p-5">
+                <StatusBadge tone={tenant.statusTone as BadgeTone}>
+                  {tenant.status}
+                </StatusBadge>
+                <h3 className="mt-4 font-semibold">{tenant.name}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {tenant.email}
+                </p>
+                <p className="mt-3 text-sm">
+                  {tenant.propertyName} - {formatMoney(tenant.rentInCents)}
+                </p>
+              </article>
+            </SpotlightCard>
+          ))}
+        </div>
+      </section>
+      <section className="space-y-4">
+        <SectionHeader title="Demandes locataires" />
+        <div className="grid gap-4 lg:grid-cols-3">
+          {owner.tenantRequests.map((request) => (
+            <ActionCard
+              actionLabel="Fait / Refuse (demo)"
+              description={`${request.tenantName} - ${request.propertyName} - ${request.category}`}
+              href="/sign-up"
+              icon={<Wrench className="size-5" />}
+              key={request.id}
+              title={request.title}
+              tone={request.statusTone as CardTone}
+            />
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+function TenantDashboardDemo() {
+  const { tenant } = demoAppData;
+
+  return (
+    <>
+      <DemoNotice />
+      <section className="space-y-4">
+        <SectionHeader title="A faire maintenant" />
+        <div className="grid gap-4 lg:grid-cols-3">
+          {tenant.actions.map((action) => (
+            <ActionCard
+              actionLabel="Action simulee"
+              description={action.description}
+              href="/sign-up"
+              icon={<WalletCards className="size-5" />}
+              key={action.id}
+              title={action.title}
+              tone={action.tone as CardTone}
+            />
+          ))}
+        </div>
+      </section>
+      <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="space-y-4">
+          <SectionHeader title="Mon logement" />
+          <Link
+            className="group block overflow-hidden rounded-xl border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            href="/demo?mode=tenant&page=contract"
+          >
+            <PropertyImage
+              alt={tenant.property.name}
+              compact
+              imageSrc={tenant.property.imageSrc}
+            />
+            <div className="space-y-4 p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold">
+                    {tenant.property.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {tenant.property.city} - proprietaire {tenant.ownerName}
+                  </p>
+                </div>
+                <StatusBadge tone={tenant.property.statusTone as BadgeTone}>
+                  {tenant.property.status}
+                </StatusBadge>
+              </div>
+              <div className="grid gap-3 text-sm sm:grid-cols-3">
+                <div>
+                  <p className="text-muted-foreground">Loyer</p>
+                  <p className="font-medium">
+                    {formatMoney(tenant.contract.rentInCents)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Charges</p>
+                  <p className="font-medium">
+                    {formatMoney(tenant.contract.chargesInCents)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Total</p>
+                  <p className="font-medium">
+                    {formatMoney(
+                      tenant.contract.rentInCents +
+                        tenant.contract.chargesInCents,
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Link>
+        </div>
+        <section className="space-y-4">
+          <SectionHeader title="Actions rapides" />
+          <QuickActionGrid actions={tenantQuickActions} />
+        </section>
+      </section>
+      <TenantPaymentsAndReceipts />
+    </>
+  );
+}
+
+function TenantPaymentsAndReceipts() {
+  const { tenant } = demoAppData;
+
+  return (
+    <section className="grid gap-6 lg:grid-cols-2">
+      <div className="space-y-4">
+        <SectionHeader title="Paiements recents" />
+        <div className="space-y-3">
+          {tenant.payments.map((payment) => (
+            <SpotlightCard key={payment.id} tone={payment.tone as CardTone}>
+              <article className="rounded-xl border bg-card p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <h3 className="font-medium">{payment.label}</h3>
+                    <StatusBadge
+                      className="mt-2"
+                      tone={payment.tone as BadgeTone}
+                    >
+                      {payment.status}
+                    </StatusBadge>
+                  </div>
+                  <p className="font-semibold">
+                    {formatMoney(payment.amountInCents)}
+                  </p>
+                </div>
+              </article>
+            </SpotlightCard>
+          ))}
+        </div>
+      </div>
+      <div className="space-y-4">
+        <SectionHeader title="Quittances" />
+        <div className="space-y-3">
+          {tenant.receipts.map((receipt) => (
+            <SpotlightCard key={receipt.id} tone={receipt.tone as CardTone}>
+              <article className="rounded-xl border bg-card p-4">
+                <h3 className="font-medium">Quittance {receipt.month}</h3>
+                <StatusBadge className="mt-2" tone={receipt.tone as BadgeTone}>
+                  {receipt.status}
+                </StatusBadge>
+              </article>
+            </SpotlightCard>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TenantContractDemo() {
+  const { tenant } = demoAppData;
+  const total = tenant.contract.rentInCents + tenant.contract.chargesInCents;
+
+  return (
+    <>
+      <DemoNotice />
+      <InfoAlert title="Lecture seule">
+        Cette page simule le detail contrat locataire. Aucun bouton de
+        modification n&apos;est disponible.
+      </InfoAlert>
+      <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <article className="group overflow-hidden rounded-xl border bg-card">
+          <PropertyImage
+            alt={tenant.property.name}
+            imageSrc={tenant.property.imageSrc}
+          />
+          <div className="space-y-3 p-5">
+            <h2 className="text-2xl font-semibold">Detail du contrat</h2>
+            <p className="text-muted-foreground">
+              {tenant.property.name} - {tenant.property.city}
+            </p>
+          </div>
+        </article>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <StatCard
+            label="Loyer"
+            value={formatMoney(tenant.contract.rentInCents)}
+          />
+          <StatCard
+            label="Charges"
+            value={formatMoney(tenant.contract.chargesInCents)}
+          />
+          <StatCard label="Total mensuel" value={formatMoney(total)} />
+          <StatCard
+            label="Depot de garantie"
+            value={formatMoney(tenant.contract.depositInCents)}
+          />
+          <StatCard label="Debut" value={tenant.contract.startDate} />
+          <StatCard label="Paiement le" value={tenant.contract.paymentDay} />
+        </div>
+      </section>
+      <TenantPaymentsAndReceipts />
+    </>
+  );
+}
+
+function TenantRequestsDemo() {
+  const { tenant } = demoAppData;
+
+  return (
+    <>
+      <DemoNotice />
+      <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <article className="rounded-xl border bg-card p-5">
+          <h2 className="text-xl font-semibold">Nouvelle demande</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Formulaire fictif : l&apos;envoi reel est disponible apres creation
+            du compte.
+          </p>
+          <div className="mt-5 grid gap-3">
+            <div className="rounded-lg border bg-muted/30 px-3 py-2 text-sm">
+              Sujet : Probleme ou question
+            </div>
+            <div className="rounded-lg border bg-muted/30 px-3 py-2 text-sm">
+              Type de demande : Document, paiement, travaux...
+            </div>
+            <div className="min-h-24 rounded-lg border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+              Message de demonstration.
+            </div>
+            <Link className={buttonVariants()} href="/sign-up">
+              Envoyer la demande (demo)
+            </Link>
+          </div>
+        </article>
+        <section className="space-y-4">
+          <SectionHeader title="Demandes au proprietaire" />
+          {tenant.requests.map((request) => (
+            <SpotlightCard key={request.id} tone={request.tone as CardTone}>
+              <article className="rounded-xl border bg-card p-5">
+                <StatusBadge tone={request.tone as BadgeTone}>
+                  {request.status}
+                </StatusBadge>
+                <h3 className="mt-3 font-semibold">{request.title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {request.category}
+                </p>
+              </article>
+            </SpotlightCard>
+          ))}
+        </section>
+      </section>
+    </>
+  );
+}
+
+function TenantAccountDemo() {
+  const { tenant } = demoAppData;
+
+  return (
+    <>
+      <DemoNotice />
+      <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+        <article className="rounded-xl border bg-card p-5">
+          <div className="flex items-center gap-4">
+            <div className="flex size-16 items-center justify-center rounded-2xl border bg-primary/16 text-xl font-semibold text-primary">
+              LM
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-xl font-semibold">Mon compte</h2>
+              <p className="truncate text-sm text-muted-foreground">
+                lea.martin@example.test
+              </p>
+            </div>
+          </div>
+        </article>
+        <article className="rounded-xl border bg-card p-5">
+          <h3 className="font-semibold">Informations personnelles</h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Facultatives dans l&apos;app reelle, non modifiables dans la demo.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <StatCard label="Prenom" value="Lea" />
+            <StatCard label="Nom" value="Martin" />
+            <StatCard label="Espace" value="Locataire" />
+            <StatCard label="Proprietaire" value={tenant.ownerName} />
+          </div>
+        </article>
+      </section>
+    </>
+  );
+}
+
+function renderOwnerPage(page: OwnerDemoPage) {
+  switch (page) {
+    case "properties":
+      return <OwnerPropertiesDemo />;
+    case "property-detail":
+      return <OwnerPropertyDetailDemo />;
+    case "contracts":
+      return <OwnerContractsDemo />;
+    case "payments":
+      return <OwnerPaymentsDemo />;
+    case "receipts":
+      return <OwnerReceiptsDemo />;
+    case "finances":
+      return <OwnerFinancesDemo />;
+    case "declarations":
+      return <OwnerDeclarationsDemo />;
+    case "tenants":
+      return <OwnerTenantsDemo />;
+    case "dashboard":
+    default:
+      return <OwnerDashboardDemo />;
+  }
+}
+
+function renderTenantPage(page: TenantDemoPage) {
+  switch (page) {
+    case "contract":
+      return <TenantContractDemo />;
+    case "requests":
+      return <TenantRequestsDemo />;
+    case "account":
+      return <TenantAccountDemo />;
+    case "dashboard":
+    default:
+      return <TenantDashboardDemo />;
+  }
+}
+
 export default async function DemoPage({ searchParams }: DemoPageProps) {
   const resolvedSearchParams = await searchParams;
   const mode = getDemoMode(resolvedSearchParams?.mode);
+  const page =
+    mode === "owner"
+      ? getOwnerPage(resolvedSearchParams?.page)
+      : getTenantPage(resolvedSearchParams?.page);
 
   return (
     <section className="space-y-10">
-      <DemoHeader mode={mode} />
-      {mode === "owner" ? <OwnerDemoContent /> : <TenantDemoContent />}
+      <DemoHeader mode={mode} page={page} />
+      {mode === "owner"
+        ? renderOwnerPage(page as OwnerDemoPage)
+        : renderTenantPage(page as TenantDemoPage)}
     </section>
   );
 }
