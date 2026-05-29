@@ -131,6 +131,8 @@
   }
   html {
     @apply font-sans;
+    scroll-padding-top: 6.5rem;
+    scroll-behavior: smooth;
   }
 
   html[data-spotlight-effects="off"] .rentflow-spotlight-effect {
@@ -151,6 +153,27 @@
 
   .landing-fade-up-delay-2 {
     animation-delay: 260ms;
+  }
+
+  .landing-scroll-reveal {
+    opacity: 0;
+    transform: translateY(34px) scale(0.985);
+    animation: landing-scroll-reveal 800ms ease-out both;
+    animation-range: entry 5% cover 30%;
+    animation-timeline: view();
+    will-change: opacity, transform;
+  }
+
+  .landing-stagger-1 {
+    animation-delay: 100ms;
+  }
+
+  .landing-stagger-2 {
+    animation-delay: 190ms;
+  }
+
+  .landing-stagger-3 {
+    animation-delay: 280ms;
   }
 
   .landing-float {
@@ -236,6 +259,17 @@
     }
   }
 
+  @keyframes landing-scroll-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(34px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
   @keyframes landing-float {
     0%,
     100% {
@@ -299,7 +333,18 @@
     }
   }
 
+  @supports not (animation-timeline: view()) {
+    .landing-scroll-reveal {
+      animation: landing-fade-up 800ms ease-out both;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-padding-top: 0;
+      scroll-behavior: auto;
+    }
+
     .landing-fade-up,
     .landing-fade-up-delay-1,
     .landing-fade-up-delay-2,
@@ -307,10 +352,12 @@
     .landing-orb,
     .landing-pulse-soft,
     .landing-line-flow,
+    .landing-scroll-reveal,
     .landing-dashboard-card,
     .landing-shine,
     .landing-shine::after {
       animation: none;
+      opacity: 1;
       transform: none;
     }
   }

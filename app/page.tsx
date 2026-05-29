@@ -185,8 +185,8 @@ const dashboardActions = [
 
 function PublicNav() {
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#071A20]/72 backdrop-blur-2xl">
-      <div className="mx-auto flex min-h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+    <header className="fixed left-0 right-0 top-3 z-[80] px-3 sm:px-6">
+      <div className="mx-auto flex min-h-16 w-full max-w-7xl items-center justify-between gap-4 rounded-[1.35rem] border border-white/10 bg-[#071A20]/72 px-4 shadow-2xl shadow-black/20 backdrop-blur-2xl sm:px-5 lg:px-6">
         <Link className="group flex items-center gap-3 font-semibold" href="/">
           <span className="flex size-10 items-center justify-center rounded-2xl border border-[#8FD8C8]/35 bg-[#102C36]/85 shadow-lg shadow-[#7BC4B8]/10 transition-transform duration-300 group-hover:scale-105">
             <Image
@@ -212,18 +212,15 @@ function PublicNav() {
           >
             Fonctionnalités
           </a>
-          <Link className="transition-colors hover:text-[#8FD8C8]" href="/demo">
+          <a className="transition-colors hover:text-[#8FD8C8]" href="#demo">
             Démo
-          </Link>
+          </a>
           <a className="transition-colors hover:text-[#8FD8C8]" href="#plans">
             Plans
           </a>
-          <Link
-            className="transition-colors hover:text-[#8FD8C8]"
-            href="/support"
-          >
+          <a className="transition-colors hover:text-[#8FD8C8]" href="#support">
             Support
-          </Link>
+          </a>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -378,7 +375,7 @@ function SectionHeading({
   description: string;
 }) {
   return (
-    <div className="landing-fade-up mx-auto max-w-3xl text-center">
+    <div className="landing-scroll-reveal mx-auto max-w-3xl text-center">
       {eyebrow ? (
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#8FD8C8]">
           {eyebrow}
@@ -406,7 +403,7 @@ function VisualCard({
   return (
     <article
       className={cn(
-        "landing-glow-card group rounded-[1.5rem] border border-white/10 bg-[#102C36]/72 p-6 shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-[#8FD8C8]/35",
+        "landing-scroll-reveal landing-glow-card group rounded-[1.5rem] border border-white/10 bg-[#102C36]/72 p-6 shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-[#8FD8C8]/35",
         className,
       )}
     >
@@ -438,7 +435,7 @@ function RoleSection({
     <section className="relative mx-auto grid max-w-7xl gap-8 px-4 py-24 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
       <div
         className={cn(
-          "landing-fade-up rounded-[2rem] border border-white/10 bg-[#102C36]/58 p-8 shadow-2xl shadow-black/25",
+          "landing-scroll-reveal rounded-[2rem] border border-white/10 bg-[#102C36]/58 p-8 shadow-2xl shadow-black/25",
           variant === "tenant" && "lg:order-2",
         )}
       >
@@ -479,7 +476,7 @@ function RoleSection({
         {cards.map((card) => (
           <VisualCard
             card={card}
-            className="landing-fade-up"
+            className="landing-stagger-1"
             key={card.title}
           />
         ))}
@@ -499,7 +496,7 @@ export default function Home() {
         <div className="landing-orb absolute right-0 top-24 -z-10 size-[28rem] rounded-full bg-[#7BC4B8]/22 blur-3xl [animation-delay:2s]" />
         <div className="landing-orb absolute bottom-24 left-1/3 -z-10 size-80 rounded-full bg-[#D8A85F]/12 blur-3xl [animation-delay:5s]" />
 
-        <div className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-7xl items-center gap-14 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_0.95fr] lg:px-8 xl:py-28">
+        <div className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-7xl items-center gap-14 px-4 pb-20 pt-28 sm:px-6 lg:grid-cols-[1fr_0.95fr] lg:px-8 xl:pb-28 xl:pt-32">
           <div>
             <p className="landing-fade-up inline-flex rounded-full border border-[#8FD8C8]/28 bg-[#102C36]/70 px-4 py-2 text-sm font-medium text-[#8FD8C8] shadow-lg shadow-black/20 backdrop-blur">
               Gestion locative guidée
@@ -566,7 +563,7 @@ export default function Home() {
             {problemCards.map((card) => (
               <VisualCard
                 card={card}
-                className="landing-fade-up"
+                className="landing-stagger-1"
                 key={card.title}
               />
             ))}
@@ -585,7 +582,12 @@ export default function Home() {
           <div className="landing-line-flow absolute left-[10%] right-[10%] top-10 hidden h-px bg-gradient-to-r from-transparent via-[#8FD8C8] to-transparent md:block" />
           {flowSteps.map((step, index) => (
             <article
-              className="landing-fade-up relative rounded-[1.5rem] border border-white/10 bg-[#102C36]/74 p-6 shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:border-[#8FD8C8]/35"
+              className={cn(
+                "landing-scroll-reveal relative rounded-[1.5rem] border border-white/10 bg-[#102C36]/74 p-6 shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:border-[#8FD8C8]/35",
+                index === 1 && "landing-stagger-1",
+                index === 2 && "landing-stagger-2",
+                index === 3 && "landing-stagger-3",
+              )}
               key={step.title}
             >
               <span className="relative z-10 flex size-12 items-center justify-center rounded-2xl border border-[#8FD8C8]/30 bg-[#071A20] text-sm font-semibold text-[#8FD8C8]">
@@ -616,7 +618,10 @@ export default function Home() {
         variant="tenant"
       />
 
-      <section className="relative border-y border-white/10 bg-[#0A232B] px-4 py-24 sm:px-6 lg:px-8">
+      <section
+        className="relative border-y border-white/10 bg-[#0A232B] px-4 py-24 sm:px-6 lg:px-8"
+        id="demo"
+      >
         <div className="landing-orb absolute left-1/2 top-10 size-80 -translate-x-1/2 rounded-full bg-[#7BC4B8]/16 blur-3xl" />
         <div className="mx-auto max-w-4xl text-center">
           <SectionHeading
@@ -632,7 +637,7 @@ export default function Home() {
               Mode locataire
             </span>
           </div>
-          <div className="landing-glow-card mx-auto mt-10 max-w-2xl rounded-[2rem] border border-[#8FD8C8]/20 bg-[#102C36]/76 p-6 shadow-2xl shadow-black/25">
+          <div className="landing-scroll-reveal landing-glow-card mx-auto mt-10 max-w-2xl rounded-[2rem] border border-[#8FD8C8]/20 bg-[#102C36]/76 p-6 shadow-2xl shadow-black/25">
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-[#8FD8C8]/20 bg-[#071A20]/70 p-4 text-left">
                 <p className="text-sm text-[#8FD8C8]">Propriétaire</p>
@@ -674,7 +679,7 @@ export default function Home() {
           {plans.map((plan) => (
             <article
               className={cn(
-                "landing-glow-card rounded-[1.75rem] border bg-[#102C36]/72 p-7 shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-1",
+                "landing-scroll-reveal landing-glow-card rounded-[1.75rem] border bg-[#102C36]/72 p-7 shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-1",
                 plan.featured
                   ? "border-[#8FD8C8]/45 shadow-[#7BC4B8]/10"
                   : "border-white/10",
@@ -696,7 +701,10 @@ export default function Home() {
         </p>
       </section>
 
-      <section className="border-y border-white/10 bg-[#0A232B] px-4 py-24 sm:px-6 lg:px-8">
+      <section
+        className="border-y border-white/10 bg-[#0A232B] px-4 py-24 sm:px-6 lg:px-8"
+        id="support"
+      >
         <SectionHeading
           eyebrow="Confiance"
           title="Pensé pour des données sensibles."
@@ -706,7 +714,7 @@ export default function Home() {
           {trustCards.map((card) => (
             <VisualCard
               card={card}
-              className="landing-fade-up"
+              className="landing-stagger-1"
               key={card.title}
             />
           ))}
@@ -715,11 +723,11 @@ export default function Home() {
 
       <section className="relative px-4 py-28 sm:px-6 lg:px-8">
         <div className="landing-orb absolute inset-x-0 top-10 mx-auto size-96 rounded-full bg-[#7BC4B8]/16 blur-3xl" />
-        <div className="landing-glow-card relative mx-auto max-w-5xl overflow-hidden rounded-[2.2rem] border border-[#8FD8C8]/22 bg-gradient-to-br from-[#102C36]/92 to-[#071A20]/92 p-8 text-center shadow-2xl shadow-black/35 sm:p-12">
+        <div className="landing-scroll-reveal landing-glow-card relative mx-auto max-w-5xl overflow-hidden rounded-[2.2rem] border border-[#8FD8C8]/22 bg-gradient-to-br from-[#102C36]/92 to-[#071A20]/92 p-8 text-center shadow-2xl shadow-black/35 sm:p-12">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(143,216,200,0.16),transparent_36%)]" />
           <div className="relative">
             <h2 className="text-4xl font-semibold tracking-normal text-[#F5F1E8] md:text-6xl">
-              Prêt à gérer vos locations dans le bon ordre ?
+              Prêt à gérer vos locations sans pression ?
             </h2>
             <p className="mx-auto mt-5 max-w-2xl leading-7 text-[#C2CDD1]">
               Explorez la démo, puis créez votre espace quand vous êtes prêt.

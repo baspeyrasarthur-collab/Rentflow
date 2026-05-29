@@ -15,19 +15,28 @@ describe("public landing and demo entry path", () => {
       "Gérez vos locations dans le bon ordre, sans oubli.",
     );
     expect(pageSource).toContain('href="/demo"');
+    expect(pageSource).toContain('href="#fonctionnalites"');
+    expect(pageSource).toContain('href="#demo"');
+    expect(pageSource).toContain('href="#plans"');
+    expect(pageSource).toContain('href="#support"');
     expect(pageSource).toContain("Voir le site");
     expect(pageSource).toContain("Créer un compte");
     expect(pageSource).toContain("Se connecter");
     expect(pageSource).toContain("Le compte locataire est gratuit.");
     expect(pageSource).toContain("Un espace propriétaire");
     expect(pageSource).toContain("Un espace locataire");
-    expect(pageSource).toContain('href="/support"');
     expect(pageSource).toContain(
       "RentFlow vous emmène directement au bon endroit.",
     );
-    expect(pageSource).toContain(
+    expect(pageSource).toContain("Prêt à gérer vos locations sans pression ?");
+    expect(pageSource).not.toContain(
+      "Prêt à gérer vos locations en 5 min / semaine ?",
+    );
+    expect(pageSource).not.toContain(
       "Prêt à gérer vos locations dans le bon ordre ?",
     );
+    expect(pageSource).toContain("fixed left-0 right-0 top-3");
+    expect(pageSource).toContain("landing-scroll-reveal");
     expect(pageSource).toContain("landing-orb");
     expect(pageSource).toContain("landing-fade-up");
     expect(pageSource).toContain("landing-float");
