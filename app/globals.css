@@ -137,3 +137,181 @@
     display: none;
   }
 }
+
+@layer utilities {
+  .landing-fade-up,
+  .landing-fade-up-delay-1,
+  .landing-fade-up-delay-2 {
+    animation: landing-fade-up 700ms ease-out both;
+  }
+
+  .landing-fade-up-delay-1 {
+    animation-delay: 120ms;
+  }
+
+  .landing-fade-up-delay-2 {
+    animation-delay: 260ms;
+  }
+
+  .landing-float {
+    animation: landing-float 8s ease-in-out infinite;
+  }
+
+  .landing-orb {
+    animation: landing-orb 16s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+  }
+
+  .landing-pulse-soft {
+    animation: landing-pulse-soft 3.2s ease-in-out infinite;
+  }
+
+  .landing-line-flow {
+    background-size: 220% 100%;
+    animation: landing-line-flow 4.8s linear infinite;
+  }
+
+  .landing-glow-card {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .landing-glow-card::before {
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    background:
+      radial-gradient(
+        420px circle at 18% 0%,
+        rgb(143 216 200 / 0.16),
+        transparent 55%
+      ),
+      radial-gradient(
+        320px circle at 100% 16%,
+        rgb(107 198 217 / 0.1),
+        transparent 55%
+      );
+    content: "";
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+
+  .landing-glow-card:hover::before,
+  .landing-glow-card:focus-within::before {
+    opacity: 1;
+  }
+
+  .landing-dashboard-card {
+    animation: landing-dashboard-card 900ms ease-out both;
+  }
+
+  .landing-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .landing-shine::after {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      110deg,
+      transparent 0%,
+      rgb(255 255 255 / 0.28) 42%,
+      transparent 58%
+    );
+    content: "";
+    transform: translateX(-130%);
+    animation: landing-shine 4.5s ease-in-out infinite;
+  }
+
+  @keyframes landing-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes landing-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+
+  @keyframes landing-orb {
+    from {
+      opacity: 0.22;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      opacity: 0.34;
+      transform: translate3d(28px, -22px, 0) scale(1.08);
+    }
+  }
+
+  @keyframes landing-pulse-soft {
+    0%,
+    100% {
+      opacity: 0.82;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.025);
+    }
+  }
+
+  @keyframes landing-line-flow {
+    from {
+      background-position: 0% 50%;
+    }
+    to {
+      background-position: 220% 50%;
+    }
+  }
+
+  @keyframes landing-dashboard-card {
+    from {
+      opacity: 0;
+      transform: translateY(28px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes landing-shine {
+    0%,
+    58% {
+      transform: translateX(-130%);
+    }
+    100% {
+      transform: translateX(130%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .landing-fade-up,
+    .landing-fade-up-delay-1,
+    .landing-fade-up-delay-2,
+    .landing-float,
+    .landing-orb,
+    .landing-pulse-soft,
+    .landing-line-flow,
+    .landing-dashboard-card,
+    .landing-shine,
+    .landing-shine::after {
+      animation: none;
+      transform: none;
+    }
+  }
+}

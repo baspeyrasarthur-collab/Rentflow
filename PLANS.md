@@ -26,8 +26,9 @@ RentFlow est un MVP SaaS de gestion locative entre propriétaires privés et loc
 ## Fonctionnalités déjà implémentées
 
 - Application Next.js App Router avec TypeScript, Tailwind CSS et configuration shadcn/ui.
-- Pages publiques minimales : accueil, connexion Clerk, inscription Clerk.
+- Landing publique V1 sous `/`, avec promesse guidee, navigation publique, CTA vers `/demo`, `/sign-up`, `/sign-in` et `/support`.
 - Demo publique V1 sous `/demo`, `/demo/finances` et `/demo/properties`, avec donnees fictives statiques et navigation dediee, sans acces base ni mutation.
+- Demo publique V1 : `/demo` permet de basculer entre un mode proprietaire et un mode locataire fictifs.
 - Demo publique V1 devenue modele visuel valide : sidebar sombre, vrai logo RentFlow, dark/light toggle, images locales fictives de biens, cards cliquables, actions rapides compactes et spotlight colore local a la demo.
 - Routage `/dashboard` vers `/owner`, `/tenant` ou `/admin` selon le rôle interne.
 - Onboarding authentifié permettant de créer un utilisateur interne OWNER ou TENANT depuis une session Clerk.
@@ -107,10 +108,10 @@ RentFlow est un MVP SaaS de gestion locative entre propriétaires privés et loc
 5. Ajouter "Changer d'espace" dans Mon compte : afficher l'espace proprietaire, l'espace locataire, leur disponibilite, et les liens vers `/owner` ou `/tenant`.
 6. Adapter `/dashboard` aux utilisateurs ayant plusieurs profils, avec un choix d'espace ou un dernier espace utilise gere par cookie cote MVP.
 7. Adapter l'acceptation d'invitation locataire pour qu'un user deja owner puisse creer ou recuperer son `TenantProfile` si l'email correspond.
-8. Mettre en place le parcours locataire rapide, sans demo locataire dediee : page choix `Proprietaire` / `Locataire`, sign-up avec parametre de role, onboarding tenant simplifie, puis redirection vers `/tenant`.
+8. Mettre en place le parcours locataire rapide : sign-up avec parametre de role, onboarding tenant simplifie, puis redirection vers `/tenant`.
 9. Ameliorer l'etat vide tenant rassurant : "Votre espace locataire est pret. Vous pourrez voir votre logement des qu'un proprietaire vous aura invite ou rattache a un contrat."
 10. Reprendre la vraie page locataire avec le style final : logement, loyer, prochain paiement, declaration "Loyer paye" / "Pas encore" si eligible, quittances, documents et aide/support.
-11. Creer la landing page publique ultra premium : future premiere page d'arrivee, inspiration BIM Agency, grandes typographies, animations sobres, CTA demo, plans et creation de compte.
+11. Finaliser le parcours d'onboarding proprietaire : choix du plan avant dashboard lorsque le billing produit est cadre, sans provider reel tant qu'il n'est pas valide.
 12. Garder les prochaines evolutions petites, reviewables, et separees des workflows metier existants.
 
 ## Points à surveiller / à traiter plus tard
@@ -132,7 +133,6 @@ RentFlow est un MVP SaaS de gestion locative entre propriétaires privés et loc
 - Ajouter progressivement les prochaines ameliorations Finances proprietaire : polish UX de la page Finances, edition eventuelle des regles recurrentes, reactivation eventuelle de regle, generation planifiee plus tard, filtres periode plus avances si besoin, rentabilite simple puis avancee, exports eventuels plus tard.
 - Continuer les depenses recurrentes proprietaire par petites etapes : modification avancee des series, reactivation, generation planifiee, suivi UX des occurrences generees et tests complementaires si le perimetre evolue.
 - Utiliser la demo publique V1 comme reference visuelle pour les prochaines refontes connectees, en gardant `/demo` separe des routes metier `/owner` et `/tenant`.
-- Ne pas creer de demo locataire dediee pour l'instant ; privilegier un sign-up locataire rapide vers le vrai dashboard `/tenant`.
 - Ajouter plus tard une page publique de choix de profil `Proprietaire` / `Locataire`.
 - Ajouter plus tard un sign-up avec parametre de role cible, sans donner au client la source de verite finale des permissions.
 - Simplifier plus tard l'onboarding tenant pour creer ou recuperer rapidement le `TenantProfile`.

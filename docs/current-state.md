@@ -8,8 +8,8 @@
 - RentFlow ne touche pas directement les loyers et ne detient pas les fonds.
 - Les providers reels restent hors scope sans validation explicite.
 - Aucun provider d'abonnement reel n'est branche.
-- Le compte locataire reste gratuit et le parcours cible locataire doit etre rapide : choix `Locataire`, creation de compte minimale, puis acces au vrai dashboard `/tenant`.
-- Il n'y aura pas de demo locataire dediee pour l'instant ; la demo publique riche reste principalement orientee proprietaire.
+- Le compte locataire reste gratuit et le parcours cible locataire doit etre rapide : landing publique, demo, choix `Locataire`, creation de compte minimale, puis acces au vrai dashboard `/tenant`.
+- La demo publique permet maintenant de basculer entre un mode proprietaire et un mode locataire, avec donnees fictives uniquement.
 
 ## 2. Stack technique figee
 
@@ -58,10 +58,11 @@
 - Refonte UI / DA : `AppShell` connecte avec sidebar desktop reductible, sidebar reduite avec icones cliquables, bouton vertical pour ouvrir/reduire, bouton theme sombre/clair discret en haut a droite et navigation mobile simple conservee.
 - Composants UI RentFlow communs crees : `PageHeader`, `SectionHeader`, `StatCard`, `ActionCard`, `StatusBadge`, `EmptyState` et `InfoAlert`.
 - Composants UI : `ActionCard`, `StatCard` et `StatusBadge` ont des accents plus visibles et servent de base a la refonte progressive.
+- Landing publique V1 : `/` presente RentFlow comme un copilote de gestion locative guidee, avec CTA principal `Voir le site` vers `/demo`, CTA de creation de compte et lien de connexion.
+- Parcours public cible : landing -> demo -> creation/connexion -> onboarding role -> plan proprietaire si applicable -> dashboard ; `/dashboard` continue de rediriger les utilisateurs connectes vers leur espace reel.
 - Demo publique V1 : routes `/demo`, `/demo/finances` et `/demo/properties`, separees des routes metier protegees `/owner` et `/tenant`.
-- Demo publique V1 : `/` redirige vers `/demo`.
 - Demo publique V1 : donnees fictives centralisees dans `app/demo/demo-data.ts`, aucune donnee reelle, aucun Prisma, aucun `requireRole`, aucun Clerk obligatoire, aucune server action, aucune mutation metier et aucun provider.
-- Demo publique V1 : navigation publique dediee dans `app/demo/layout.tsx`, avec sidebar sombre, navigation verticale, vrai logo RentFlow, toggle dark/light, CTA vers `/sign-up` et `/sign-in`, et orientation proprietaire uniquement pour l'instant.
+- Demo publique V1 : navigation publique dediee dans `app/demo/layout.tsx`, avec sidebar sombre, navigation verticale, vrai logo RentFlow, toggle dark/light, CTA vers `/sign-up` et `/sign-in`, et bascule visible entre espace proprietaire et espace locataire sur `/demo`.
 - Demo publique V1 : elle sert maintenant de modele visuel valide pour les prochaines refontes connectees.
 - Demo publique V1 : images locales fictives de biens dans `public/demo/properties`, cards cliquables, animations hover, spotlight colore local a la demo sauf sur les cards logements avec images, et actions rapides compactes en bas de page sous forme de pills icone + titre au hover/focus.
 - Demo publique V1 : les actions demo pointent vers `/sign-up`, jamais vers `/owner` ou `/tenant`.
@@ -117,7 +118,6 @@
 - Rentabilite avancee.
 - Fiscalite.
 - Exports.
-- Demo locataire dediee hors scope actuel.
 - Connexion bancaire.
 - Agregateur bancaire.
 - Calcul automatique d'amortissement d'emprunt.
@@ -129,9 +129,8 @@
 - UI : animations et micro-interactions globales a stabiliser hors demo.
 - Module fiscalite / declarations pas encore code.
 - Page Mes locataires pas encore codee.
-- Parcours locataire rapide a finaliser : choix de profil public, sign-up locataire rapide, onboarding tenant simplifie et etat vide rassurant sur `/tenant`.
+- Parcours locataire rapide a finaliser : sign-up avec role cible, onboarding tenant simplifie et etat vide rassurant sur `/tenant`.
 - Vraie page locataire finale a reprendre plus tard.
-- Landing page publique ultra premium pas encore creee.
 - TODO demo : ajouter plus tard une entree Support dans la demo publique,
   inspiree de `/support`, sans donnees reelles.
 
