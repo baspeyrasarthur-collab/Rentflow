@@ -28,7 +28,10 @@ describe("public landing and demo entry path", () => {
     expect(pageSource).toContain(
       "RentFlow vous emmène directement au bon endroit.",
     );
-    expect(pageSource).toContain("Prêt à gérer vos locations sans pression ?");
+    expect(pageSource).toContain("Prêt à gérer vos locations sans stress ?");
+    expect(pageSource).not.toContain(
+      "Prêt à gérer vos locations sans pression ?",
+    );
     expect(pageSource).not.toContain(
       "Prêt à gérer vos locations en 5 min / semaine ?",
     );
@@ -36,11 +39,28 @@ describe("public landing and demo entry path", () => {
       "Prêt à gérer vos locations dans le bon ordre ?",
     );
     expect(pageSource).toContain("fixed left-0 right-0 top-3");
-    expect(pageSource).toContain("landing-scroll-reveal");
+    expect(pageSource).toContain("ScrollReveal");
+    expect(pageSource).toContain("landing-final-glow");
+    expect(pageSource).toContain("landing-cta-glow");
     expect(pageSource).toContain("landing-orb");
     expect(pageSource).toContain("landing-fade-up");
     expect(pageSource).toContain("landing-float");
     expect(pageSource).toContain("landing-line-flow");
+  });
+
+  it("uses an IntersectionObserver driven scroll reveal animation", () => {
+    const scrollRevealSource = readWorkspaceFile(
+      "components/landing/scroll-reveal.tsx",
+    );
+    const globalCssSource = readWorkspaceFile("app/globals.css");
+
+    expect(scrollRevealSource).toContain("IntersectionObserver");
+    expect(scrollRevealSource).toContain("prefers-reduced-motion: reduce");
+    expect(scrollRevealSource).toContain("is-visible");
+    expect(globalCssSource).toContain(".landing-scroll-reveal.is-visible");
+    expect(globalCssSource).toContain(".landing-scroll-left");
+    expect(globalCssSource).toContain(".landing-scroll-right");
+    expect(globalCssSource).toContain("prefers-reduced-motion: reduce");
   });
 
   it("keeps the landing free of real seeded user data", () => {
