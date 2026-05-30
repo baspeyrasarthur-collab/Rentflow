@@ -447,13 +447,7 @@ export default async function TenantIndexPage() {
         !hasDeclaredPaidExternally && canPayWithMockProvider(payment),
     };
   });
-  const firstMandateToAccept = contractTenantsWithMandateState.find(
-    ({ canAcceptMockMandate }) => canAcceptMockMandate,
-  );
   const firstDeclarablePayment = externalPaymentsToDeclare[0] ?? null;
-  const firstMockPayablePayment = paymentsWithState.find(
-    ({ canPayWithMock }) => canPayWithMock,
-  );
   const firstReceiptRequestPayment = paymentsWithState.find(
     ({ receiptRequestState }) => receiptRequestState.canRequestReceipt,
   );
@@ -474,8 +468,6 @@ export default async function TenantIndexPage() {
     firstDeclarablePayment ? "declare-payment" : null,
     firstReceiptRequestPayment ? "receipt-request" : null,
     firstAvailableReceipt ? "available-receipt" : null,
-    firstMandateToAccept ? "mandate" : null,
-    firstMockPayablePayment && !firstAvailableReceipt ? "mock-payment" : null,
   ]
     .filter(Boolean)
     .slice(0, 4);
@@ -491,8 +483,6 @@ export default async function TenantIndexPage() {
   const showReceiptRequestAction = priorityActions.includes("receipt-request");
   const showAvailableReceiptAction =
     priorityActions.includes("available-receipt");
-  const showMandateAction = priorityActions.includes("mandate");
-  const showMockPaymentAction = priorityActions.includes("mock-payment");
   const primaryContractRental =
     currentRentals.find((rental) => rental.status === "ACTIVE") ??
     currentRentals[0] ??
@@ -712,28 +702,6 @@ export default async function TenantIndexPage() {
               </div>
             ) : null}
 
-            {showMandateAction && firstMandateToAccept ? (
-              <ActionCard
-                title="Accepter le mandat mock"
-                description="Simulation uniquement : aucun vrai prelevement ne sera effectue."
-                tone="warning"
-              >
-                <form action={acceptMockMandateAction}>
-                  <input
-                    name="contractTenantId"
-                    type="hidden"
-                    value={firstMandateToAccept.contractTenant.id}
-                  />
-                  <button
-                    className={buttonVariants({ size: "sm" })}
-                    type="submit"
-                  >
-                    Accepter le mandat mock
-                  </button>
-                </form>
-              </ActionCard>
-            ) : null}
-
             {showReceiptRequestAction && firstReceiptRequestPayment ? (
               <ActionCard
                 title="Demander une quittance"
@@ -794,32 +762,6 @@ export default async function TenantIndexPage() {
                     </button>
                   </form>
                 </div>
-              </ActionCard>
-            ) : null}
-
-            {showMockPaymentAction && firstMockPayablePayment ? (
-              <ActionCard
-                title="Paiement mock disponible"
-                description="Paiement via RentFlow optionnel, en simulation uniquement."
-                value={formatMoney(
-                  firstMockPayablePayment.payment.amountInCents,
-                  firstMockPayablePayment.payment.currency,
-                )}
-                tone="default"
-              >
-                <form action={payTenantPaymentWithMockProviderAction}>
-                  <input
-                    name="paymentId"
-                    type="hidden"
-                    value={firstMockPayablePayment.payment.id}
-                  />
-                  <button
-                    className={buttonVariants({ size: "sm" })}
-                    type="submit"
-                  >
-                    Payer avec le mandat mock
-                  </button>
-                </form>
               </ActionCard>
             ) : null}
           </div>
@@ -1260,17 +1202,24 @@ export default async function TenantIndexPage() {
 
                     <InfoAlert
                       className="mt-5"
-                      title="Mandat mock"
+                      title="Paiement automatique simule"
                       tone={hasAcceptedMandate ? "success" : "info"}
                     >
                       <p>
-                        Aucun vrai prelevement ne sera effectue et aucun IBAN
-                        complet ne sera stocke.
+                        Cette option sert uniquement a simuler une autorisation
+                        de prelevement dans RentFlow. Si vous payez votre loyer
+                        par virement externe, vous n&apos;avez pas besoin de
+                        mandat. Cette option ne concerne pas les virements
+                        externes.
                       </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <StatusBadge tone="muted">Optionnel</StatusBadge>
+                        <StatusBadge tone="info">Simulation</StatusBadge>
+                      </div>
 
                       {hasAcceptedMandate ? (
                         <p className="mt-2 font-medium text-foreground">
-                          Mandat mock accepte
+                          Autorisation de prelevement simulee activee
                           {latestMandate?.acceptedAt
                             ? ` le ${formatDate(latestMandate.acceptedAt)}`
                             : ""}
@@ -1289,7 +1238,7 @@ export default async function TenantIndexPage() {
                             className={buttonVariants({ size: "sm" })}
                             type="submit"
                           >
-                            Accepter le mandat mock
+                            Activer le paiement automatique simule
                           </button>
                         </form>
                       ) : null}
@@ -1603,7 +1552,7 @@ export default async function TenantIndexPage() {
                             className={buttonVariants({ size: "sm" })}
                             type="submit"
                           >
-                            Payer avec le mandat mock
+                            Payer avec RentFlow simule
                           </button>
                         </form>
                       ) : null}
@@ -1619,8 +1568,9 @@ export default async function TenantIndexPage() {
 
                     {canPayWithMock ? (
                       <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                        Paiement via RentFlow optionnel. Simulation uniquement :
-                        aucun vrai prelevement ne sera effectue.
+                        Paiement automatique simule et optionnel. Aucun vrai
+                        prelevement ne sera effectue. Cette option ne concerne
+                        pas les virements externes.
                       </p>
                     ) : null}
                   </article>

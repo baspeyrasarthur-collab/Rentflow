@@ -9,5 +9,6 @@ export { PageHeader } from "./page-header";
 export { OwnerQuickActions } from "./owner-quick-actions";
 export { SectionHeader } from "./section-header";
 export { SpotlightCard, type SpotlightCardTone } from "./spotlight-card";
+export { ScrollToFocus } from "./scroll-to-focus";
 export { StatCard } from "./stat-card";
 export { StatusBadge } from "./status-badge";

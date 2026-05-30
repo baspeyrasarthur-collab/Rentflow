@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { prisma } from "@/server/db/prisma";
@@ -179,6 +180,10 @@ export async function updateOwnerPropertyImageAction(formData: FormData) {
 
   await removeLocalPropertyImageByUrl(property.imageUrl);
 
+  revalidatePath(`/owner/properties/${property.id}`);
+  revalidatePath("/owner/properties");
+  revalidatePath("/owner");
+
   redirect(`/owner/properties/${property.id}`);
 }
 
@@ -242,6 +247,10 @@ export async function removeOwnerPropertyImageAction(formData: FormData) {
   });
 
   await removeLocalPropertyImageByUrl(property.imageUrl);
+
+  revalidatePath(`/owner/properties/${property.id}`);
+  revalidatePath("/owner/properties");
+  revalidatePath("/owner");
 
   redirect(`/owner/properties/${property.id}`);
 }

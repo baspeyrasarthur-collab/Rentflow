@@ -14,6 +14,7 @@ import {
   InfoAlert,
   OwnerQuickActions,
   PageHeader,
+  ScrollToFocus,
   SectionHeader,
   SpotlightCard,
   StatCard,
@@ -149,6 +150,7 @@ export default async function OwnerPaymentsPage({
 
   return (
     <section className="space-y-8">
+      <ScrollToFocus />
       <PageHeader
         eyebrow="Paiements"
         title="Paiements"

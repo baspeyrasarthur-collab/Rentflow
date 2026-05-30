@@ -354,6 +354,9 @@ describe("tenant dashboard payment declarations", () => {
         }),
       }),
     );
+    expect(mocks.paymentFindMany.mock.calls[1]?.[0].select).not.toHaveProperty(
+      "contractTenant",
+    );
   });
 
   it("loads external payments to declare one day before the due date, but not earlier", async () => {

@@ -21,6 +21,9 @@ describe("property image UI wiring", () => {
 
     expect(ownerDetailSource).toContain("updateOwnerPropertyImageAction");
     expect(ownerDetailSource).toContain("removeOwnerPropertyImageAction");
+    expect(ownerDetailSource).toContain('encType="multipart/form-data"');
+    expect(ownerDetailSource).toContain('name="propertyId"');
+    expect(ownerDetailSource).toContain('name="image"');
     expect(ownerDetailSource).toContain(
       'accept="image/png,image/jpeg,image/webp"',
     );
@@ -60,6 +63,7 @@ describe("property image UI wiring", () => {
 
     expect(ownerDetailSource).toContain("PropertyHeroVisual");
     expect(ownerDetailSource).toContain("imageUrl={property.imageUrl}");
+    expect(ownerDetailSource).toContain("group-hover/image:scale-105");
     expect(ownerDetailSource).not.toContain('import Image from "next/image"');
     expect(ownerListSource).toContain("PropertyVisual");
     expect(ownerListSource).toContain("imageUrl={property.imageUrl}");

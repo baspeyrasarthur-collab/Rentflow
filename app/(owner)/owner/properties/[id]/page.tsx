@@ -10,6 +10,7 @@ import {
   OwnerQuickActions,
   PageHeader,
   SectionHeader,
+  ScrollToFocus,
   SpotlightCard,
   StatCard,
   StatusBadge,
@@ -160,7 +161,7 @@ function PropertyHeroVisual({
   return (
     <div
       className={cn(
-        "relative min-h-44 overflow-hidden rounded-xl border bg-gradient-to-br shadow-xl shadow-black/20",
+        "group/image relative h-56 overflow-hidden rounded-xl border bg-gradient-to-br shadow-xl shadow-black/20 md:h-64",
         propertyVisualClasses[status] ?? propertyVisualClasses.ACTIVE,
         status === "ARCHIVED" ? "border-border grayscale" : "border-primary/35",
       )}
@@ -169,7 +170,7 @@ function PropertyHeroVisual({
         // eslint-disable-next-line @next/next/no-img-element
         <img
           alt={`Photo du logement ${name}`}
-          className="h-full min-h-44 w-full object-cover"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover/image:scale-105"
           src={imageUrl}
         />
       ) : (
@@ -274,6 +275,7 @@ export default async function OwnerPropertyDetailPage({
 
   return (
     <section className="space-y-8">
+      <ScrollToFocus />
       <PageHeader
         eyebrow="Detail logement"
         title={property.name}
@@ -474,7 +476,7 @@ export default async function OwnerPropertyDetailPage({
           title="Informations du bien"
           description="Adresse, caracteristiques, photo et historique du dossier logement."
         />
-        <div className="grid gap-4 xl:grid-cols-[0.9fr_1.4fr]">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(340px,1fr)]">
           <article className="h-full rounded-xl border border-primary/35 bg-primary/8 p-4 text-card-foreground shadow-sm shadow-black/10 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-primary/60 hover:shadow-xl hover:shadow-black/20">
             <PropertyHeroVisual
               imageUrl={property.imageUrl}
@@ -503,6 +505,7 @@ export default async function OwnerPropertyDetailPage({
             </div>
             <form
               action={updateOwnerPropertyImageAction}
+              encType="multipart/form-data"
               className="mt-4 space-y-3 rounded-lg border border-border/80 bg-background/45 p-3"
             >
               <input name="propertyId" type="hidden" value={property.id} />
@@ -514,7 +517,7 @@ export default async function OwnerPropertyDetailPage({
                 </span>
                 <input
                   accept="image/png,image/jpeg,image/webp"
-                  className="min-h-10 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground"
+                  className="min-h-10 w-full min-w-0 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground"
                   name="image"
                   required
                   type="file"
@@ -557,10 +560,13 @@ export default async function OwnerPropertyDetailPage({
             ) : null}
           </article>
 
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid content-start gap-4">
             <SpotlightCard tone="info">
-              <article className="h-full rounded-xl border border-ring/35 bg-ring/8 p-5 text-card-foreground shadow-sm shadow-black/10">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <article
+                className="rounded-xl border border-ring/35 bg-ring/8 p-4 text-card-foreground shadow-sm shadow-black/10 transition-all duration-300 hover:border-ring/55"
+                id="missing-fields"
+              >
+                <div className="flex items-start justify-between gap-3">
                   <h3 className="font-semibold tracking-normal text-foreground">
                     Adresse
                   </h3>
@@ -569,41 +575,41 @@ export default async function OwnerPropertyDetailPage({
                       variant: "outline",
                       size: "sm",
                     })}
-                    href={`${propertyPath}/edit`}
+                    href={`${propertyPath}/edit?focus=missing-fields`}
                   >
-                    Modifier les informations
+                    Modifier
                   </Link>
                 </div>
-                <dl className="mt-4 grid gap-4 text-sm">
-                  <div>
+                <dl className="mt-4 grid gap-2 text-sm">
+                  <div className="rounded-lg border border-border/80 bg-background/45 px-3 py-2">
                     <dt className="text-muted-foreground">Adresse</dt>
-                    <dd className="mt-1 font-medium text-foreground">
+                    <dd className="mt-1 font-medium leading-6 text-foreground">
                       {property.addressLine1}
                     </dd>
                   </div>
                   {property.addressLine2 ? (
-                    <div>
+                    <div className="rounded-lg border border-border/80 bg-background/45 px-3 py-2">
                       <dt className="text-muted-foreground">Complement</dt>
-                      <dd className="mt-1 font-medium text-foreground">
+                      <dd className="mt-1 font-medium leading-6 text-foreground">
                         {property.addressLine2}
                       </dd>
                     </div>
                   ) : null}
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <div className="rounded-lg border border-border/80 bg-background/45 px-3 py-2">
                       <dt className="text-muted-foreground">Code postal</dt>
                       <dd className="mt-1 font-medium text-foreground">
                         {property.postalCode}
                       </dd>
                     </div>
-                    <div>
+                    <div className="rounded-lg border border-border/80 bg-background/45 px-3 py-2">
                       <dt className="text-muted-foreground">Ville</dt>
                       <dd className="mt-1 font-medium text-foreground">
                         {property.city}
                       </dd>
                     </div>
                   </div>
-                  <div>
+                  <div className="rounded-lg border border-border/80 bg-background/45 px-3 py-2">
                     <dt className="text-muted-foreground">Pays</dt>
                     <dd className="mt-1 font-medium text-foreground">
                       {property.country}
@@ -614,8 +620,11 @@ export default async function OwnerPropertyDetailPage({
             </SpotlightCard>
 
             <SpotlightCard tone={getPropertySpotlightTone(property.status)}>
-              <article className="h-full rounded-xl border border-primary/35 bg-primary/8 p-5 text-card-foreground shadow-sm shadow-black/10">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <article
+                className="rounded-xl border border-primary/35 bg-primary/8 p-4 text-card-foreground shadow-sm shadow-black/10 transition-all duration-300 hover:border-primary/55"
+                id="characteristics"
+              >
+                <div className="flex items-start justify-between gap-3">
                   <h3 className="font-semibold tracking-normal text-foreground">
                     Caracteristiques
                   </h3>
@@ -624,13 +633,13 @@ export default async function OwnerPropertyDetailPage({
                       variant: "outline",
                       size: "sm",
                     })}
-                    href={`${propertyPath}/edit`}
+                    href={`${propertyPath}/edit?focus=characteristics`}
                   >
-                    Modifier les caracteristiques
+                    Modifier
                   </Link>
                 </div>
-                <dl className="mt-4 grid gap-4 text-sm">
-                  <div className="flex items-center justify-between gap-4">
+                <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+                  <div className="flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border/80 bg-background/45 px-3 py-2">
                     <dt className="text-muted-foreground">Statut</dt>
                     <dd>
                       <StatusBadge tone={getStatusTone(property.status)}>
@@ -639,40 +648,40 @@ export default async function OwnerPropertyDetailPage({
                       </StatusBadge>
                     </dd>
                   </div>
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border/80 bg-background/45 px-3 py-2">
                     <dt className="text-muted-foreground">Type</dt>
-                    <dd className="font-medium text-foreground">
+                    <dd className="truncate text-right font-medium text-foreground">
                       {propertyTypeLabels[property.propertyType] ??
                         property.propertyType}
                     </dd>
                   </div>
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border/80 bg-background/45 px-3 py-2">
                     <dt className="text-muted-foreground">Surface</dt>
-                    <dd className="font-medium text-foreground">
+                    <dd className="text-right font-medium text-foreground">
                       {getSurfaceLabel(property.surfaceAreaSqm)}
                     </dd>
                   </div>
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border/80 bg-background/45 px-3 py-2">
                     <dt className="text-muted-foreground">Meuble</dt>
-                    <dd className="font-medium text-foreground">
+                    <dd className="text-right font-medium text-foreground">
                       {property.furnished ? "Oui" : "Non"}
                     </dd>
                   </div>
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border/80 bg-background/45 px-3 py-2">
                     <dt className="text-muted-foreground">Colocation</dt>
-                    <dd className="font-medium text-foreground">
+                    <dd className="text-right font-medium text-foreground">
                       {property.isColocation ? "Oui" : "Non"}
                     </dd>
                   </div>
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border/80 bg-background/45 px-3 py-2">
                     <dt className="text-muted-foreground">Cree le</dt>
-                    <dd className="font-medium text-foreground">
+                    <dd className="text-right font-medium text-foreground">
                       {formatDate(property.createdAt)}
                     </dd>
                   </div>
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex min-w-0 items-center justify-between gap-3 rounded-lg border border-border/80 bg-background/45 px-3 py-2 sm:col-span-2">
                     <dt className="text-muted-foreground">Mis a jour le</dt>
-                    <dd className="font-medium text-foreground">
+                    <dd className="text-right font-medium text-foreground">
                       {formatDate(property.updatedAt)}
                     </dd>
                   </div>

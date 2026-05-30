@@ -117,4 +117,19 @@ describe("owner and tenant guidance UI", () => {
     expect(statCardSource).toContain("break-words text-2xl");
     expect(statCardSource).not.toContain("[overflow-wrap:anywhere]");
   });
+
+  it("keeps property address and characteristics compact with precise edit focus links", () => {
+    const source = readWorkspaceFile(
+      "app/(owner)/owner/properties/[id]/page.tsx",
+    );
+
+    expect(source).toContain('id="missing-fields"');
+    expect(source).toContain('id="characteristics"');
+    expect(source).toContain("edit?focus=missing-fields");
+    expect(source).toContain("edit?focus=characteristics");
+    expect(source).toContain("grid content-start gap-4");
+    expect(source).toContain("rounded-lg border border-border/80");
+    expect(source).not.toContain("Modifier les informations");
+    expect(source).not.toContain("Modifier les caracteristiques");
+  });
 });

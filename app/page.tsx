@@ -8,7 +8,6 @@ import {
   ClipboardList,
   FileText,
   HomeIcon,
-  KeyRound,
   LifeBuoy,
   LockKeyhole,
   ReceiptText,
@@ -20,6 +19,7 @@ import {
 import type { ComponentType } from "react";
 
 import { ScrollReveal } from "@/components/landing/scroll-reveal";
+import { LandingThemeToggle } from "@/components/landing/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -116,11 +116,6 @@ const tenantCards: LandingCard[] = [
     description: "Les demandes importantes restent guidées et simples.",
     icon: ReceiptText,
   },
-  {
-    title: "Contacter mon propriétaire",
-    description: "Une demande claire, sans chat ni pièces jointes en V1.",
-    icon: KeyRound,
-  },
 ];
 
 const plans = [
@@ -128,6 +123,13 @@ const plans = [
     name: "Free",
     label: "Pour démarrer",
     description: "Un premier espace pour tester le rythme guidé de RentFlow.",
+    features: [
+      "Tableau de bord guidé",
+      "Suivi des biens principaux",
+      "Actions à faire maintenant",
+      "Espace locataire gratuit",
+      "Support de base",
+    ],
   },
   {
     name: "Pro",
@@ -135,11 +137,25 @@ const plans = [
     description:
       "Le plan mis en avant pour plusieurs logements et un suivi plus fluide.",
     featured: true,
+    features: [
+      "Gestion de plusieurs biens",
+      "Paiements et quittances",
+      "Demandes locataires",
+      "Export finances",
+      "Données à compléter pour la déclaration",
+    ],
   },
   {
     name: "Scale",
     label: "Pour plusieurs biens",
     description: "Une base pensée pour les portefeuilles qui grandissent.",
+    features: [
+      "Gestion avancée multi-biens",
+      "Vue consolidée",
+      "Exports plus complets",
+      "Organisation locataires / contrats",
+      "Accompagnement évolutif",
+    ],
   },
 ];
 
@@ -225,6 +241,7 @@ function PublicNav() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <LandingThemeToggle />
           <Link
             className={buttonVariants({
               variant: "outline",
@@ -382,7 +399,7 @@ function SectionHeading({
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="mt-4 text-4xl font-semibold tracking-normal text-[#F5F1E8] md:text-5xl">
+      <h2 className="mt-4 text-4xl font-semibold leading-[0.95] tracking-[-0.045em] text-[#F5F1E8] md:text-5xl">
         {title}
       </h2>
       <p className="mt-5 text-base leading-7 text-[#A8B8BE] md:text-lg">
@@ -445,7 +462,7 @@ function RoleSection({
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#8FD8C8]">
           {variant === "owner" ? "Propriétaire" : "Locataire"}
         </p>
-        <h2 className="mt-4 text-4xl font-semibold tracking-normal text-[#F5F1E8] md:text-5xl">
+        <h2 className="mt-4 text-4xl font-semibold leading-[0.95] tracking-[-0.045em] text-[#F5F1E8] md:text-5xl">
           {title}
         </h2>
         <p className="mt-5 leading-7 text-[#A8B8BE]">{description}</p>
@@ -504,7 +521,7 @@ export default function Home() {
             <p className="landing-fade-up inline-flex rounded-full border border-[#8FD8C8]/28 bg-[#102C36]/70 px-4 py-2 text-sm font-medium text-[#8FD8C8] shadow-lg shadow-black/20 backdrop-blur">
               Gestion locative guidée
             </p>
-            <h1 className="landing-fade-up-delay-1 mt-7 max-w-5xl text-5xl font-semibold tracking-normal text-[#F5F1E8] sm:text-6xl lg:text-7xl xl:text-8xl">
+            <h1 className="landing-fade-up-delay-1 mt-7 max-w-5xl bg-gradient-to-r from-[#F5F1E8] via-[#F5F1E8] to-[#8FD8C8] bg-clip-text text-5xl font-semibold leading-[0.9] tracking-[-0.06em] text-transparent sm:text-6xl lg:text-7xl xl:text-8xl">
               Gérez vos locations dans le bon ordre, sans oubli.
             </h1>
             <p className="landing-fade-up-delay-2 mt-7 max-w-2xl text-lg leading-8 text-[#C2CDD1]">
@@ -689,12 +706,25 @@ export default function Home() {
               key={plan.name}
             >
               <p className="text-sm font-medium text-[#8FD8C8]">{plan.label}</p>
-              <h3 className="mt-4 text-3xl font-semibold tracking-normal text-[#F5F1E8]">
+              <h3 className="mt-4 text-3xl font-semibold leading-none tracking-[-0.035em] text-[#F5F1E8]">
                 {plan.name}
               </h3>
               <p className="mt-4 leading-7 text-[#A8B8BE]">
                 {plan.description}
               </p>
+              <details className="mt-6 rounded-2xl border border-white/10 bg-[#071A20]/50 p-4">
+                <summary className="cursor-pointer text-sm font-semibold text-[#8FD8C8] transition-colors hover:text-[#6BC6D9]">
+                  Fonctionnalités incluses
+                </summary>
+                <ul className="mt-4 space-y-2 text-sm leading-6 text-[#C2CDD1]">
+                  {plan.features.map((feature) => (
+                    <li className="flex gap-2" key={feature}>
+                      <CheckCircle2 className="mt-1 size-4 shrink-0 text-[#8FD8C8]" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
             </ScrollReveal>
           ))}
         </div>
@@ -729,8 +759,8 @@ export default function Home() {
         <ScrollReveal className="landing-cta-glow landing-glow-card relative mx-auto max-w-5xl overflow-hidden rounded-[2.2rem] border border-[#8FD8C8]/35 bg-gradient-to-br from-[#123A45]/95 via-[#102C36]/96 to-[#0A232B]/94 p-8 text-center shadow-2xl shadow-[#7BC4B8]/15 sm:p-12">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(143,216,200,0.24),transparent_40%)]" />
           <div className="relative">
-            <h2 className="text-4xl font-semibold tracking-normal text-[#F5F1E8] md:text-6xl">
-              Prêt à gérer vos locations sans stress ?
+            <h2 className="bg-gradient-to-r from-[#F5F1E8] via-[#8FD8C8] to-[#6BC6D9] bg-clip-text text-4xl font-semibold leading-[0.95] tracking-[-0.055em] text-transparent md:text-6xl">
+              Prêt à gérer vos locations sans pression ?
             </h2>
             <p className="mx-auto mt-5 max-w-2xl leading-7 text-[#C2CDD1]">
               Explorez la démo, puis créez votre espace quand vous êtes prêt.

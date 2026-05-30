@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   getCurrentOwnerProfileForProperties: vi.fn(),
   propertyFindFirst: vi.fn(),
   propertyUpdate: vi.fn(),
+  revalidatePath: vi.fn(),
   redirect: vi.fn(),
   removeLocalPropertyImageByUrl: vi.fn(),
   transaction: vi.fn(),
@@ -13,6 +14,10 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("next/navigation", () => ({
   redirect: mocks.redirect,
+}));
+
+vi.mock("next/cache", () => ({
+  revalidatePath: mocks.revalidatePath,
 }));
 
 vi.mock("@/server/db/prisma", () => ({
@@ -146,6 +151,11 @@ describe("owner property image actions", () => {
     expect(mocks.removeLocalPropertyImageByUrl).toHaveBeenCalledWith(
       "/uploads/properties/old-photo.jpg",
     );
+    expect(mocks.revalidatePath).toHaveBeenCalledWith(
+      "/owner/properties/property_1",
+    );
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/owner/properties");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/owner");
   });
 
   it("refuses to update an image for a property outside the owner scope", async () => {
@@ -196,6 +206,11 @@ describe("owner property image actions", () => {
     expect(mocks.removeLocalPropertyImageByUrl).toHaveBeenCalledWith(
       "/uploads/properties/old-photo.jpg",
     );
+    expect(mocks.revalidatePath).toHaveBeenCalledWith(
+      "/owner/properties/property_1",
+    );
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/owner/properties");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/owner");
   });
 
   it("refuses image removal without explicit confirmation", async () => {

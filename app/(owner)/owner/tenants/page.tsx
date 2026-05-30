@@ -11,6 +11,7 @@ import {
   InfoAlert,
   OwnerQuickActions,
   PageHeader,
+  ScrollToFocus,
   SectionHeader,
   SpotlightCard,
   StatCard,
@@ -182,6 +183,7 @@ export default async function OwnerTenantsPage({
 
   return (
     <section className="space-y-8">
+      <ScrollToFocus />
       <PageHeader
         eyebrow="Locataires"
         title="Mes locataires"

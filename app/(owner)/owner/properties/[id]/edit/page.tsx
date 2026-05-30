@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { InfoAlert } from "@/components/ui/rentflow";
+import { InfoAlert, ScrollToFocus } from "@/components/ui/rentflow";
 import { cn } from "@/lib/utils";
 import { redirectAfterRoleAccessError } from "@/server/auth/current-user";
 import { getOwnerPropertyById } from "@/server/owner/properties";
@@ -58,6 +58,7 @@ export default async function EditOwnerPropertyPage({
 
   return (
     <section className="max-w-3xl space-y-8">
+      <ScrollToFocus />
       <div className="space-y-3">
         <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
           Modifier logement

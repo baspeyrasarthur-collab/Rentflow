@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeftRight,
   BarChart3,
   Building2,
   ClipboardList,
@@ -62,7 +63,7 @@ const ownerNavLinks: DemoNavLink[] = [
   },
   {
     href: "/demo?mode=owner&page=declarations",
-    label: "Declarations",
+    label: "Déclarations",
     icon: ClipboardList,
   },
   { href: "/support", label: "Support", icon: LifeBuoy },
@@ -146,6 +147,12 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const isDarkTheme = theme === "dark";
   const areSpotlightEffectsEnabled = spotlightEffects === "on";
+  const switchHref =
+    mode === "owner"
+      ? "/demo?mode=tenant&page=dashboard"
+      : "/demo?mode=owner&page=dashboard";
+  const switchLabel =
+    mode === "owner" ? "Voir la démo locataire" : "Voir la démo propriétaire";
   const topActionClassName =
     "group/top-action inline-flex h-10 w-10 items-center justify-start gap-2 overflow-hidden rounded-full border border-border/80 bg-card/85 px-2.5 text-sm font-medium text-muted-foreground shadow-sm shadow-black/10 backdrop-blur transition-all duration-300 hover:w-56 hover:border-primary/45 hover:bg-primary/12 hover:text-foreground focus-visible:w-56 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
@@ -231,7 +238,7 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
             )}
           >
             <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-              Demo
+              Démo
             </span>
             <span
               className={cn(
@@ -239,19 +246,22 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
                 isSidebarCollapsed && "sr-only",
               )}
             >
-              Donnees fictives
+              Données fictives
             </span>
           </div>
           <Link
             className={cn(
-              "inline-flex text-xs font-medium text-primary hover:text-primary/80",
-              isSidebarCollapsed && "sr-only",
+              "inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary to-ring px-3 py-2 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              isSidebarCollapsed &&
+                "size-10 rounded-xl p-0 text-primary-foreground",
             )}
-            href={mode === "owner" ? "/demo?mode=tenant" : "/demo?mode=owner"}
+            href={switchHref}
+            title={switchLabel}
           >
-            {mode === "owner"
-              ? "Voir l'espace locataire"
-              : "Voir l'espace proprietaire"}
+            <ArrowLeftRight className="size-4 shrink-0" />
+            <span className={cn(isSidebarCollapsed && "sr-only")}>
+              {switchLabel}
+            </span>
           </Link>
         </div>
 
@@ -310,21 +320,21 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
               isSidebarCollapsed && "sr-only",
             )}
           >
-            Tester avec vos donnees
+            Tester avec vos données
           </p>
           <div className={cn("grid gap-2", isSidebarCollapsed && "gap-1")}>
             <Link
-              aria-label="Creer un compte"
+              aria-label="Créer un compte"
               className={buttonVariants({
                 size: isSidebarCollapsed ? "icon" : "default",
               })}
               href="/sign-up"
-              title="Creer un compte"
+              title="Créer un compte"
             >
               {isSidebarCollapsed ? (
                 <UserPlus className="size-4" />
               ) : (
-                "Creer un compte"
+                "Créer un compte"
               )}
             </Link>
             <Link
@@ -349,8 +359,8 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
       <button
         aria-label={
           isSidebarCollapsed
-            ? "Ouvrir la barre laterale"
-            : "Reduire la barre laterale"
+            ? "Ouvrir la barre latérale"
+            : "Réduire la barre latérale"
         }
         aria-pressed={isSidebarCollapsed}
         className={cn(
@@ -383,7 +393,7 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
           </Link>
           <div className="flex items-center gap-2">
             <Link className={buttonVariants({ size: "sm" })} href="/sign-up">
-              Creer un compte
+              Créer un compte
             </Link>
             <Link
               className={buttonVariants({
@@ -416,7 +426,7 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
             <button
               aria-label={
                 areSpotlightEffectsEnabled
-                  ? "Desactiver les effets lumineux"
+                  ? "Désactiver les effets lumineux"
                   : "Activer les effets lumineux"
               }
               aria-pressed={!areSpotlightEffectsEnabled}
@@ -434,15 +444,14 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
         <div className="border-t px-4 py-3">
           <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
             <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-1 font-medium text-primary">
-              Demo - donnees fictives
+              Démo — données fictives
             </span>
             <Link
-              className="font-medium text-primary"
-              href={mode === "owner" ? "/demo?mode=tenant" : "/demo?mode=owner"}
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-ring px-3 py-1.5 font-semibold text-primary-foreground shadow-sm shadow-primary/20"
+              href={switchHref}
             >
-              {mode === "owner"
-                ? "Voir l'espace locataire"
-                : "Voir l'espace proprietaire"}
+              <ArrowLeftRight className="size-3.5" />
+              {switchLabel}
             </Link>
           </div>
           <nav aria-label="Navigation demo mobile" className="overflow-x-auto">
@@ -483,13 +492,23 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
       >
         <div className="sticky top-4 z-30 mb-4 hidden justify-end gap-2 md:flex">
           <Link
+            className={cn(
+              buttonVariants({ size: "sm" }),
+              "h-10 gap-2 rounded-full bg-gradient-to-r from-primary to-ring px-4 font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/25",
+            )}
+            href={switchHref}
+          >
+            <ArrowLeftRight className="size-4" />
+            {switchLabel}
+          </Link>
+          <Link
             className={topActionClassName}
             href="/"
-            title="Retour presentation"
+            title="Retour présentation"
           >
             <Sparkles className="size-4 shrink-0 text-primary" />
             <span className="whitespace-nowrap opacity-0 transition-opacity duration-300 group-hover/top-action:opacity-100 group-focus-visible/top-action:opacity-100">
-              Retour presentation
+              Retour présentation
             </span>
           </Link>
           <button
@@ -513,7 +532,7 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
           <button
             aria-label={
               areSpotlightEffectsEnabled
-                ? "Desactiver les effets lumineux"
+                ? "Désactiver les effets lumineux"
                 : "Activer les effets lumineux"
             }
             aria-pressed={!areSpotlightEffectsEnabled}
@@ -521,7 +540,7 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
             onClick={toggleSpotlightEffects}
             title={
               areSpotlightEffectsEnabled
-                ? "Desactiver les effets lumineux"
+                ? "Désactiver les effets lumineux"
                 : "Activer les effets lumineux"
             }
             type="button"
@@ -546,7 +565,7 @@ export default function DemoLayout({ children }: DemoLayoutProps) {
       fallback={
         <div className="min-h-screen bg-background px-6 py-8 text-foreground">
           <div className="mx-auto max-w-7xl rounded-xl border bg-card p-6 shadow-sm">
-            Chargement de la demo...
+            Chargement de la démo...
           </div>
         </div>
       }

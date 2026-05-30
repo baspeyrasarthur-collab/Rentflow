@@ -34,6 +34,31 @@ describe("tenant dashboard guidance UI", () => {
     );
   });
 
+  it("does not present the mock mandate as an urgent tenant action", () => {
+    const todoSection = tenantPageSource.slice(
+      tenantPageSource.indexOf('title="A faire maintenant"'),
+      tenantPageSource.indexOf('title="Mon mois"'),
+    );
+
+    expect(todoSection).not.toContain("mandate");
+    expect(todoSection).not.toContain("mock-payment");
+    expect(todoSection).not.toContain("Accepter le mandat mock");
+    expect(todoSection).not.toContain("Mandat mock");
+    expect(tenantPageSource).not.toContain("Accepter le mandat mock");
+    expect(tenantPageSource).not.toContain("Mandat mock");
+  });
+
+  it("keeps the simulated automatic payment option clearly optional", () => {
+    expect(tenantPageSource).toContain('title="Paiement automatique simule"');
+    expect(tenantPageSource).toContain("Optionnel");
+    expect(tenantPageSource).toContain(
+      "Cette option ne concerne pas les virements",
+    );
+    expect(tenantPageSource).toContain(
+      "Activer le paiement automatique simule",
+    );
+  });
+
   it("lets tenants mark an available receipt as seen from urgent actions", () => {
     expect(tenantPageSource).toContain("markTenantReceiptAsSeenAction");
     expect(tenantPageSource).toContain("unseenAvailableReceipts");

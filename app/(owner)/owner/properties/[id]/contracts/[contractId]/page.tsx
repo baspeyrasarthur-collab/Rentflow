@@ -16,6 +16,7 @@ import {
   EmptyState,
   InfoAlert,
   PageHeader,
+  ScrollToFocus,
   SectionHeader,
   StatCard,
   StatusBadge,
@@ -354,6 +355,7 @@ export default async function OwnerContractDetailPage({
 
   return (
     <section className="space-y-8">
+      <ScrollToFocus />
       <PageHeader
         eyebrow="Detail contrat"
         title={`Contrat ${contractTypeLabels[contract.contractType] ?? contract.contractType}`}

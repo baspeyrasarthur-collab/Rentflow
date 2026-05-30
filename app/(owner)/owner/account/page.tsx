@@ -17,6 +17,7 @@ import {
   InfoAlert,
   OwnerQuickActions,
   PageHeader,
+  ScrollToFocus,
   SectionHeader,
   SpotlightCard,
   StatusBadge,
@@ -186,6 +187,7 @@ export default async function OwnerAccountPage({
 
   return (
     <section className="space-y-8">
+      <ScrollToFocus />
       <PageHeader
         eyebrow="Compte"
         title="Mon compte"

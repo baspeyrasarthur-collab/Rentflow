@@ -28,9 +28,9 @@ describe("public landing and demo entry path", () => {
     expect(pageSource).toContain(
       "RentFlow vous emmène directement au bon endroit.",
     );
-    expect(pageSource).toContain("Prêt à gérer vos locations sans stress ?");
+    expect(pageSource).toContain("Prêt à gérer vos locations sans pression ?");
     expect(pageSource).not.toContain(
-      "Prêt à gérer vos locations sans pression ?",
+      "Prêt à gérer vos locations sans stress ?",
     );
     expect(pageSource).not.toContain(
       "Prêt à gérer vos locations en 5 min / semaine ?",
@@ -46,6 +46,26 @@ describe("public landing and demo entry path", () => {
     expect(pageSource).toContain("landing-fade-up");
     expect(pageSource).toContain("landing-float");
     expect(pageSource).toContain("landing-line-flow");
+    expect(pageSource).toContain("LandingThemeToggle");
+    expect(pageSource).toContain("Fonctionnalités incluses");
+    expect(pageSource).toContain("Free");
+    expect(pageSource).toContain("Pro");
+    expect(pageSource).toContain("Scale");
+    expect(pageSource).toContain("tracking-[-0.06em]");
+    expect(pageSource).not.toContain("Contacter mon propriétaire");
+    expect(pageSource).not.toContain(
+      "Une demande claire, sans chat ni pièces jointes en V1.",
+    );
+  });
+
+  it("keeps the public landing theme toggle available", () => {
+    const themeToggleSource = readWorkspaceFile(
+      "components/landing/theme-toggle.tsx",
+    );
+
+    expect(themeToggleSource).toContain("Activer le mode clair");
+    expect(themeToggleSource).toContain("Activer le mode sombre");
+    expect(themeToggleSource).toContain("rentflow-theme");
   });
 
   it("uses an IntersectionObserver driven scroll reveal animation", () => {
@@ -75,35 +95,44 @@ describe("public landing and demo entry path", () => {
     const demoSource = readWorkspaceFile("app/demo/page.tsx");
     const demoLayoutSource = readWorkspaceFile("app/demo/layout.tsx");
 
-    expect(demoSource).toContain("Demo - donnees fictives");
-    expect(demoSource).toContain("Voir l'espace locataire");
-    expect(demoSource).toContain("Voir l'espace proprietaire");
-    expect(demoSource).toContain("/demo?mode=tenant");
-    expect(demoSource).toContain("Creer un compte");
+    expect(demoSource).toContain("Démo — données fictives");
+    expect(demoSource).toContain("Voir la démo locataire");
+    expect(demoSource).toContain("Voir la démo propriétaire");
+    expect(demoSource).toContain("/demo?mode=tenant&page=dashboard");
+    expect(demoSource).toContain("/demo?mode=owner&page=dashboard");
+    expect(demoSource).toContain("Créer un compte");
     expect(demoSource).toContain("Se connecter");
-    expect(demoSource).toContain("Retour presentation");
+    expect(demoSource).toContain("Retour présentation");
     expect(demoLayoutSource).toContain("/demo?mode=owner&page=properties");
     expect(demoLayoutSource).toContain("/demo?mode=tenant&page=requests");
-    expect(demoLayoutSource).toContain("Demo - donnees fictives");
+    expect(demoLayoutSource).toContain("Démo — données fictives");
+    expect(demoLayoutSource).toContain("Voir la démo locataire");
+    expect(demoLayoutSource).toContain("Voir la démo propriétaire");
   });
 
   it("simulates the owner pages with fictive app data", () => {
     const demoSource = readWorkspaceFile("app/demo/page.tsx");
     const demoDataSource = readWorkspaceFile("app/demo/demo-data.ts");
 
-    expect(demoSource).toContain("A faire maintenant");
+    expect(demoSource).toContain("À faire maintenant");
+    expect(demoSource).toContain("Ajouter un logement");
+    expect(demoSource).toContain("Mettre à jour les loyers");
+    expect(demoSource).toContain("Générer une quittance");
+    expect(demoSource).toContain("Modifier les contrats");
+    expect(demoSource).toContain("Inviter un locataire");
+    expect(demoSource).toContain("Exporter mes finances");
     expect(demoSource).toContain("Liste des biens");
-    expect(demoSource).toContain("Detail logement");
+    expect(demoSource).toContain("Détail logement");
     expect(demoSource).toContain("Contrats");
     expect(demoSource).toContain("Paiements");
     expect(demoSource).toContain("Quittances");
-    expect(demoSource).toContain("Resume financier");
-    expect(demoSource).toContain("Declarations");
+    expect(demoSource).toContain("Résumé financier");
+    expect(demoSource).toContain("Déclarations");
     expect(demoSource).toContain("Locataires actifs et demandes");
     expect(demoDataSource).toContain("Appartement Canal");
-    expect(demoDataSource).toContain("Studio Republique");
+    expect(demoDataSource).toContain("Studio République");
     expect(demoDataSource).toContain("Maison des Pins");
-    expect(demoDataSource).toContain("Lea Martin");
+    expect(demoDataSource).toContain("Léa Martin");
     expect(demoDataSource).toContain("Hugo Bernard");
     expect(demoDataSource).toContain("Camille Moreau");
   });
@@ -112,11 +141,16 @@ describe("public landing and demo entry path", () => {
     const demoSource = readWorkspaceFile("app/demo/page.tsx");
     const demoDataSource = readWorkspaceFile("app/demo/demo-data.ts");
 
-    expect(demoSource).toContain("Declarer un loyer paye");
+    expect(demoSource).toContain("Détails contrat");
+    expect(demoSource).toContain("Mettre fin à un contrat");
+    expect(demoSource).toContain("Déclarer un loyer payé");
+    expect(demoSource).toContain("Demande propriétaire");
     expect(demoSource).toContain("Mon logement");
-    expect(demoSource).toContain("Detail du contrat");
-    expect(demoSource).toContain("Demandes au proprietaire");
+    expect(demoSource).toContain("Détail du contrat");
+    expect(demoSource).toContain("Demandes au propriétaire");
     expect(demoSource).toContain("Mon compte");
+    expect(demoSource).not.toContain("Accepter le mandat mock");
+    expect(demoSource).not.toContain("Mandat mock");
     expect(demoDataSource).toContain("Appartement Canal");
     expect(demoDataSource).toContain("Arthur B.");
   });
@@ -125,7 +159,7 @@ describe("public landing and demo entry path", () => {
     const demoSource = readWorkspaceFile("app/demo/page.tsx");
     const demoLayoutSource = readWorkspaceFile("app/demo/layout.tsx");
 
-    expect(demoSource).toContain("Action simulee");
+    expect(demoSource).toContain("Action simulée");
     expect(demoSource).toContain('href="/sign-up"');
     expect(demoSource).not.toContain('"use server"');
     expect(demoSource).not.toContain("requireOwnerAccess");

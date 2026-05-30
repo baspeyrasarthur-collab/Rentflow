@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
+  ArrowLeftRight,
   ArrowRight,
   BarChart3,
   Building2,
@@ -82,18 +83,18 @@ const tenantPages = new Set<TenantDemoPage>([
 const ownerQuickActions = [
   {
     label: "Ajouter un logement",
-    href: "/demo?mode=owner&page=properties",
+    href: "/sign-up",
     icon: <Plus className="size-5" />,
     tone: "info",
   },
   {
-    label: "Mettre a jour les loyers",
+    label: "Mettre à jour les loyers",
     href: "/demo?mode=owner&page=payments",
     icon: <WalletCards className="size-5" />,
     tone: "warning",
   },
   {
-    label: "Generer une quittance",
+    label: "Générer une quittance",
     href: "/demo?mode=owner&page=receipts",
     icon: <ReceiptText className="size-5" />,
     tone: "success",
@@ -120,25 +121,25 @@ const ownerQuickActions = [
 
 const tenantQuickActions = [
   {
-    label: "Details contrat",
+    label: "Détails contrat",
     href: "/demo?mode=tenant&page=contract",
     icon: <FileText className="size-5" />,
     tone: "info",
   },
   {
-    label: "Mettre fin a un contrat",
+    label: "Mettre fin à un contrat",
     href: "/sign-up",
     icon: <KeyRound className="size-5" />,
     tone: "warning",
   },
   {
-    label: "Declarer un loyer paye",
+    label: "Déclarer un loyer payé",
     href: "/sign-up",
     icon: <WalletCards className="size-5" />,
     tone: "success",
   },
   {
-    label: "Demande proprietaire",
+    label: "Demande propriétaire",
     href: "/demo?mode=tenant&page=requests",
     icon: <Send className="size-5" />,
     tone: "default",
@@ -173,9 +174,9 @@ function getPageTitle(mode: DemoMode, page: OwnerDemoPage | TenantDemoPage) {
   if (mode === "tenant") {
     const tenantTitles: Record<TenantDemoPage, string> = {
       account: "Mon compte",
-      contract: "Detail du contrat",
+      contract: "Détail du contrat",
       dashboard: "Tableau de bord locataire",
-      requests: "Demandes au proprietaire",
+      requests: "Demandes au propriétaire",
     };
 
     return tenantTitles[page as TenantDemoPage];
@@ -183,12 +184,12 @@ function getPageTitle(mode: DemoMode, page: OwnerDemoPage | TenantDemoPage) {
 
   const ownerTitles: Record<OwnerDemoPage, string> = {
     contracts: "Contrats",
-    dashboard: "Tableau de bord proprietaire",
-    declarations: "Declarations",
+    dashboard: "Tableau de bord propriétaire",
+    declarations: "Déclarations",
     finances: "Finances",
     payments: "Paiements",
     properties: "Biens",
-    "property-detail": "Detail logement",
+    "property-detail": "Détail logement",
     receipts: "Quittances",
     tenants: "Locataires",
   };
@@ -203,26 +204,33 @@ function DemoHeader({
   mode: DemoMode;
   page: OwnerDemoPage | TenantDemoPage;
 }) {
-  const targetMode = mode === "owner" ? "tenant" : "owner";
+  const switchHref =
+    mode === "owner"
+      ? "/demo?mode=tenant&page=dashboard"
+      : "/demo?mode=owner&page=dashboard";
+  const switchLabel =
+    mode === "owner" ? "Voir la démo locataire" : "Voir la démo propriétaire";
 
   return (
     <PageHeader
-      eyebrow="Demo - donnees fictives"
+      eyebrow="Démo — données fictives"
       title={getPageTitle(mode, page)}
-      description="Cette demo reprend l'apparence des vraies pages RentFlow avec des donnees fictives et des actions simulees."
+      description="Cette démo reprend l'apparence des vraies pages RentFlow avec des données fictives et des actions simulées."
       actions={
         <>
           <Link className={buttonVariants({ variant: "outline" })} href="/">
             <ArrowLeft className="size-4" />
-            Retour presentation
+            Retour présentation
           </Link>
           <Link
-            className={buttonVariants({ variant: "outline" })}
-            href={`/demo?mode=${targetMode}`}
+            className={cn(
+              buttonVariants(),
+              "gap-2 bg-gradient-to-r from-primary to-ring shadow-lg shadow-primary/20",
+            )}
+            href={switchHref}
           >
-            {mode === "owner"
-              ? "Voir l'espace locataire"
-              : "Voir l'espace proprietaire"}
+            <ArrowLeftRight className="size-4" />
+            {switchLabel}
           </Link>
           <Link
             className={buttonVariants({ variant: "outline" })}
@@ -231,7 +239,7 @@ function DemoHeader({
             Se connecter
           </Link>
           <Link className={buttonVariants()} href="/sign-up">
-            Creer un compte
+            Créer un compte
           </Link>
         </>
       }
@@ -241,9 +249,9 @@ function DemoHeader({
 
 function DemoNotice() {
   return (
-    <InfoAlert title="Demo - donnees fictives">
-      Les actions sont simulees. Aucun paiement, aucune quittance, aucune
-      invitation et aucune donnee reelle ne sont crees depuis cette demo.
+    <InfoAlert title="Démo — données fictives">
+      Les actions sont simulées. Aucun paiement, aucune quittance, aucune
+      invitation et aucune donnée réelle ne sont créés depuis cette démo.
     </InfoAlert>
   );
 }
@@ -292,13 +300,13 @@ function QuickActionGrid({
         <ActionCard
           actionLabel={
             action.href === "/sign-up"
-              ? "Action simulee"
-              : "Ouvrir dans la demo"
+              ? "Action simulée"
+              : "Ouvrir dans la démo"
           }
           description={
             action.href === "/sign-up"
-              ? "Disponible apres creation du compte."
-              : "Navigation interne dans la demo."
+              ? "Action simulée — créez un compte pour l'utiliser avec vos données."
+              : "Navigation interne dans la démo."
           }
           href={action.href}
           icon={action.icon}
@@ -328,7 +336,7 @@ function PaymentRow({
               {payment.label} - {payment.propertyName}
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              {payment.tenantName} - echeance {payment.dueDate} - {payment.kind}
+              {payment.tenantName} - échéance {payment.dueDate} - {payment.kind}
             </p>
           </div>
           <p className="text-xl font-semibold">
@@ -349,31 +357,31 @@ function OwnerDashboardDemo() {
 
       <section className="space-y-4">
         <SectionHeader
-          title="A faire maintenant"
+          title="À faire maintenant"
           description="Les actions prioritaires remontent comme dans le vrai dashboard owner."
         />
         <div className="grid gap-4 lg:grid-cols-3">
           <ActionCard
             actionLabel="Ouvrir les paiements"
-            description="Hugo Bernard a declare un loyer paye. Confirmez seulement apres reception reelle."
+            description="Hugo Bernard a déclaré un loyer payé. Confirmez seulement après réception réelle."
             href="/demo?mode=owner&page=payments"
             icon={<WalletCards className="size-5" />}
-            title="Paiement a confirmer"
+            title="Paiement à confirmer"
             tone="warning"
             value={1}
           />
           <ActionCard
             actionLabel="Ouvrir les quittances"
-            description="Une quittance demandee attend une generation fictive."
+            description="Une quittance demandée attend une génération fictive."
             href="/demo?mode=owner&page=receipts"
             icon={<ReceiptText className="size-5" />}
-            title="Quittance a generer"
+            title="Quittance à générer"
             tone="info"
             value={1}
           />
           <ActionCard
             actionLabel="Ouvrir la demande"
-            description="Une demande locataire ouverte attend une reponse."
+            description="Une demande locataire ouverte attend une réponse."
             href="/demo?mode=owner&page=tenants"
             icon={<Send className="size-5" />}
             title="Demande locataire"
@@ -385,18 +393,18 @@ function OwnerDashboardDemo() {
 
       <section className="space-y-4">
         <SectionHeader
-          title="Recapitulatif du mois"
+          title="Récapitulatif du mois"
           description={`Vue fictive du mois de ${owner.monthLabel}.`}
         />
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
             icon={<CheckCircle2 className="size-5" />}
-            label="Loyers confirmes"
+            label="Loyers confirmés"
             value={formatMoney(owner.summary.confirmedRentInCents)}
           />
           <StatCard
             icon={<WalletCards className="size-5" />}
-            label="A encaisser"
+            label="À encaisser"
             value={formatMoney(owner.summary.pendingRentInCents)}
           />
           <StatCard
@@ -406,7 +414,7 @@ function OwnerDashboardDemo() {
           />
           <StatCard
             icon={<BarChart3 className="size-5" />}
-            label="Cash-flow estime"
+            label="Cash-flow estimé"
             value={formatSignedMoney(owner.summary.cashFlowInCents)}
           />
         </div>
@@ -423,7 +431,7 @@ function OwnerDashboardDemo() {
             </Link>
           }
           title="Mes biens"
-          description="Les cards logement reprennent le comportement de l'app : bloc cliquable, image sans spotlight, zoom conserve."
+          description="Les cards logement reprennent le comportement de l'app : bloc cliquable, image sans spotlight, zoom conservé."
         />
         <div className="grid gap-4 lg:grid-cols-3">
           {owner.properties.map((property) => (
@@ -452,7 +460,7 @@ function OwnerDashboardDemo() {
                   </StatusBadge>
                 </div>
                 <span className="inline-flex items-center gap-2 text-sm font-medium text-primary">
-                  Voir detail
+                  Voir détail
                   <ArrowRight className="size-4" />
                 </span>
               </div>
@@ -467,7 +475,7 @@ function OwnerDashboardDemo() {
       </section>
 
       <section className="space-y-4">
-        <SectionHeader title="Activite recente" />
+        <SectionHeader title="Activité récente" />
         <div className="grid gap-4 lg:grid-cols-3">
           {owner.recentActivity.map((activity) => (
             <SpotlightCard key={activity} tone="info">
@@ -497,7 +505,7 @@ function OwnerPropertiesDemo() {
             </Link>
           }
           title="Liste des biens"
-          description="Trois logements fictifs, avec image, statut, loyer et chemin vers le detail."
+          description="Trois logements fictifs, avec image, statut, loyer et chemin vers le détail."
         />
         <div className="grid gap-4 lg:grid-cols-3">
           {owner.properties.map((property) => (
@@ -568,11 +576,11 @@ function OwnerPropertyDetailDemo() {
           </div>
         </article>
         <section className="space-y-4">
-          <SectionHeader title="Synthese logement" />
+          <SectionHeader title="Synthèse logement" />
           <div className="grid gap-4 sm:grid-cols-2">
             <StatCard label="Type" value={property.type} />
             <StatCard label="Surface" value={property.surface} />
-            <StatCard label="Fiscalite" value={property.fiscalType} />
+            <StatCard label="Fiscalité" value={property.fiscalType} />
             <StatCard
               label="Total mensuel"
               value={formatMoney(
@@ -583,11 +591,11 @@ function OwnerPropertyDetailDemo() {
         </section>
       </section>
       <section className="space-y-4">
-        <SectionHeader title="Contrats lies" />
+        <SectionHeader title="Contrats liés" />
         <div className="grid gap-4 lg:grid-cols-2">
           <ActionCard
             actionLabel="Voir contrats"
-            description="Bail habitation meuble - locataire Lea Martin - lecture fictive."
+            description="Bail habitation meublé - locataire Léa Martin - lecture fictive."
             href="/demo?mode=owner&page=contracts"
             icon={<FileText className="size-5" />}
             title="Contrat actif"
@@ -595,10 +603,10 @@ function OwnerPropertyDetailDemo() {
           />
           <ActionCard
             actionLabel="Suivre paiements"
-            description="Paiements recents et quittances du logement."
+            description="Paiements récents et quittances du logement."
             href="/demo?mode=owner&page=payments"
             icon={<WalletCards className="size-5" />}
-            title="Paiements recents"
+            title="Paiements récents"
             tone="info"
           />
         </div>
@@ -631,7 +639,7 @@ function OwnerContractsDemo() {
                   )}
                   href="/sign-up"
                 >
-                  Action simulee
+                  Action simulée
                 </Link>
               </article>
             </SpotlightCard>
@@ -649,7 +657,7 @@ function OwnerPaymentsDemo() {
       <section className="space-y-4">
         <SectionHeader
           title="Paiements"
-          description="Un paiement declare paye n'est pas compte comme recu tant que le proprietaire ne confirme pas."
+          description="Un paiement déclaré payé n'est pas compte comme reçu tant que le propriétaire ne confirme pas."
         />
         <div className="grid gap-4 lg:grid-cols-2">
           {demoAppData.owner.payments.map((payment) => (
@@ -671,11 +679,11 @@ function OwnerReceiptsDemo() {
           {demoAppData.owner.receipts.map((receipt) => (
             <ActionCard
               actionLabel={
-                receipt.status === "Demandee" ? "Generer (demo)" : "Voir"
+                receipt.status === "Demandée" ? "Générer (démo)" : "Voir"
               }
               description={`${receipt.tenantName} - ${receipt.propertyName} - ${receipt.month}`}
               href={
-                receipt.status === "Demandee"
+                receipt.status === "Demandée"
                   ? "/sign-up"
                   : "/demo?mode=owner&page=receipts"
               }
@@ -698,10 +706,10 @@ function OwnerFinancesDemo() {
     <>
       <DemoNotice />
       <section className="space-y-4">
-        <SectionHeader title="Resume financier" />
+        <SectionHeader title="Résumé financier" />
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
-            label="Loyers confirmes"
+            label="Loyers confirmés"
             value={formatMoney(owner.summary.confirmedRentInCents)}
           />
           <StatCard
@@ -709,7 +717,7 @@ function OwnerFinancesDemo() {
             value={formatMoney(owner.summary.outgoingInCents)}
           />
           <StatCard
-            label="Cash-flow estime"
+            label="Cash-flow estimé"
             value={formatSignedMoney(owner.summary.cashFlowInCents)}
           />
           <StatCard
@@ -721,7 +729,7 @@ function OwnerFinancesDemo() {
       <section className="grid gap-4 lg:grid-cols-2">
         <details className="rounded-xl border bg-card p-5">
           <summary className="cursor-pointer font-semibold">
-            Sorties par categorie
+            Sorties par catégorie
           </summary>
           <div className="mt-4 divide-y">
             {owner.expenses.map((expense) => (
@@ -739,7 +747,7 @@ function OwnerFinancesDemo() {
         </details>
         <details className="rounded-xl border bg-card p-5">
           <summary className="cursor-pointer font-semibold">
-            Depenses detaillees
+            Dépenses détaillées
           </summary>
           <div className="mt-4 divide-y">
             {owner.expenses.map((expense) => (
@@ -766,17 +774,17 @@ function OwnerDeclarationsDemo() {
   return (
     <>
       <DemoNotice />
-      <InfoAlert title="Preparation fiscale fictive" tone="warning">
-        RentFlow aide a preparer des donnees a verifier, mais ne genere pas de
-        declaration officielle.
+      <InfoAlert title="Préparation fiscale fictive" tone="warning">
+        RentFlow aide à préparer des données à vérifier, mais ne génère pas de
+        déclaration officielle.
       </InfoAlert>
       <section className="space-y-4">
-        <SectionHeader title="Donnees a completer" />
+        <SectionHeader title="Données à compléter" />
         <div className="grid gap-4 lg:grid-cols-2">
           {declarations.missingItems.map((item) => (
             <ActionCard
               actionLabel="Voir le logement"
-              description="Lien direct fictif vers l'endroit ou corriger la donnee dans l'app reelle."
+              description="Lien direct fictif vers l'endroit où corriger la donnée dans l'app réelle."
               href="/demo?mode=owner&page=property-detail"
               icon={<Building2 className="size-5" />}
               key={item}
@@ -788,12 +796,12 @@ function OwnerDeclarationsDemo() {
       </section>
       <section className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
         <StatCard
-          label={`Montant prepare ${declarations.year}`}
+          label={`Montant préparé ${declarations.year}`}
           value={formatMoney(declarations.preparedIncomeInCents)}
         />
         <details className="rounded-xl border bg-card p-5">
           <summary className="cursor-pointer font-semibold">
-            Conseils personnalises
+            Conseils personnalisés
           </summary>
           <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
             {declarations.advice.map((advice) => (
@@ -838,7 +846,7 @@ function OwnerTenantsDemo() {
         <div className="grid gap-4 lg:grid-cols-3">
           {owner.tenantRequests.map((request) => (
             <ActionCard
-              actionLabel="Fait / Refuse (demo)"
+              actionLabel="Fait / Refusé (démo)"
               description={`${request.tenantName} - ${request.propertyName} - ${request.category}`}
               href="/sign-up"
               icon={<Wrench className="size-5" />}
@@ -860,11 +868,11 @@ function TenantDashboardDemo() {
     <>
       <DemoNotice />
       <section className="space-y-4">
-        <SectionHeader title="A faire maintenant" />
+        <SectionHeader title="À faire maintenant" />
         <div className="grid gap-4 lg:grid-cols-3">
           {tenant.actions.map((action) => (
             <ActionCard
-              actionLabel="Action simulee"
+              actionLabel="Action simulée"
               description={action.description}
               href="/sign-up"
               icon={<WalletCards className="size-5" />}
@@ -894,7 +902,7 @@ function TenantDashboardDemo() {
                     {tenant.property.name}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {tenant.property.city} - proprietaire {tenant.ownerName}
+                    {tenant.property.city} - propriétaire {tenant.ownerName}
                   </p>
                 </div>
                 <StatusBadge tone={tenant.property.statusTone as BadgeTone}>
@@ -943,7 +951,7 @@ function TenantPaymentsAndReceipts() {
   return (
     <section className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-4">
-        <SectionHeader title="Paiements recents" />
+        <SectionHeader title="Paiements récents" />
         <div className="space-y-3">
           {tenant.payments.map((payment) => (
             <SpotlightCard key={payment.id} tone={payment.tone as CardTone}>
@@ -994,7 +1002,7 @@ function TenantContractDemo() {
     <>
       <DemoNotice />
       <InfoAlert title="Lecture seule">
-        Cette page simule le detail contrat locataire. Aucun bouton de
+        Cette page simule le détail contrat locataire. Aucun bouton de
         modification n&apos;est disponible.
       </InfoAlert>
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
@@ -1004,7 +1012,7 @@ function TenantContractDemo() {
             imageSrc={tenant.property.imageSrc}
           />
           <div className="space-y-3 p-5">
-            <h2 className="text-2xl font-semibold">Detail du contrat</h2>
+            <h2 className="text-2xl font-semibold">Détail du contrat</h2>
             <p className="text-muted-foreground">
               {tenant.property.name} - {tenant.property.city}
             </p>
@@ -1021,7 +1029,7 @@ function TenantContractDemo() {
           />
           <StatCard label="Total mensuel" value={formatMoney(total)} />
           <StatCard
-            label="Depot de garantie"
+            label="Dépôt de garantie"
             value={formatMoney(tenant.contract.depositInCents)}
           />
           <StatCard label="Debut" value={tenant.contract.startDate} />
@@ -1043,26 +1051,26 @@ function TenantRequestsDemo() {
         <article className="rounded-xl border bg-card p-5">
           <h2 className="text-xl font-semibold">Nouvelle demande</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Formulaire fictif : l&apos;envoi reel est disponible apres creation
+            Formulaire fictif : l&apos;envoi réel est disponible après création
             du compte.
           </p>
           <div className="mt-5 grid gap-3">
             <div className="rounded-lg border bg-muted/30 px-3 py-2 text-sm">
-              Sujet : Probleme ou question
+              Sujet : Problème ou question
             </div>
             <div className="rounded-lg border bg-muted/30 px-3 py-2 text-sm">
               Type de demande : Document, paiement, travaux...
             </div>
             <div className="min-h-24 rounded-lg border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
-              Message de demonstration.
+              Message de démonstration.
             </div>
             <Link className={buttonVariants()} href="/sign-up">
-              Envoyer la demande (demo)
+              Envoyer la demande (démo)
             </Link>
           </div>
         </article>
         <section className="space-y-4">
-          <SectionHeader title="Demandes au proprietaire" />
+          <SectionHeader title="Demandes au propriétaire" />
           {tenant.requests.map((request) => (
             <SpotlightCard key={request.id} tone={request.tone as CardTone}>
               <article className="rounded-xl border bg-card p-5">
@@ -1105,13 +1113,13 @@ function TenantAccountDemo() {
         <article className="rounded-xl border bg-card p-5">
           <h3 className="font-semibold">Informations personnelles</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Facultatives dans l&apos;app reelle, non modifiables dans la demo.
+            Facultatives dans l&apos;app réelle, non modifiables dans la démo.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <StatCard label="Prenom" value="Lea" />
+            <StatCard label="Prénom" value="Léa" />
             <StatCard label="Nom" value="Martin" />
             <StatCard label="Espace" value="Locataire" />
-            <StatCard label="Proprietaire" value={tenant.ownerName} />
+            <StatCard label="Propriétaire" value={tenant.ownerName} />
           </div>
         </article>
       </section>

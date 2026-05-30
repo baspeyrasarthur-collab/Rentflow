@@ -8,6 +8,7 @@ import {
   InfoAlert,
   OwnerQuickActions,
   PageHeader,
+  ScrollToFocus,
   SectionHeader,
   SpotlightCard,
   StatCard,
@@ -74,11 +75,22 @@ async function getReceiptsForPage() {
   }
 }
 
-export default async function OwnerReceiptsPage() {
+function getSearchParamValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function OwnerReceiptsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ focus?: string | string[] }>;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const focus = getSearchParamValue(resolvedSearchParams?.focus);
   const receipts = await getReceiptsForPage();
 
   return (
     <section className="space-y-8">
+      <ScrollToFocus />
       <PageHeader
         eyebrow="Quittances"
         title="Quittances"
@@ -181,49 +193,71 @@ export default async function OwnerReceiptsPage() {
           />
         ) : (
           <div className="grid gap-4 lg:grid-cols-2">
-            {receipts.requestedReceipts.map((receipt) => (
-              <SpotlightCard key={receipt.id} tone="warning">
-                <article className="h-full rounded-xl border border-chart-4/55 bg-chart-4/14 p-5 text-card-foreground shadow-sm shadow-black/10">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <h3 className="font-semibold tracking-normal text-foreground">
-                        {receipt.property.name}
-                      </h3>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {getTenantLabel(receipt)} -{" "}
-                        {formatDate(receipt.periodStart)} au{" "}
-                        {formatDate(receipt.periodEnd)}
-                      </p>
-                      <div className="mt-3">
-                        <StatusBadge
-                          tone={getReceiptStatusTone(receipt.status)}
+            {receipts.requestedReceipts.map((receipt) => {
+              const isFocusedReceipt = focus === `receipt-${receipt.id}`;
+
+              return (
+                <SpotlightCard key={receipt.id} tone="warning">
+                  <article
+                    className={[
+                      "h-full rounded-xl border border-chart-4/55 bg-chart-4/14 p-5 text-card-foreground shadow-sm shadow-black/10 transition-all duration-300",
+                      isFocusedReceipt
+                        ? "border-chart-4/75 bg-chart-4/10 shadow-lg shadow-chart-4/10"
+                        : "",
+                    ].join(" ")}
+                    id={`receipt-${receipt.id}`}
+                  >
+                    {isFocusedReceipt ? (
+                      <InfoAlert
+                        className="mb-4"
+                        title="Action ciblee"
+                        tone="warning"
+                      >
+                        Action ciblee : traitez cette demande de quittance
+                        depuis le contrat concerne.
+                      </InfoAlert>
+                    ) : null}
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <h3 className="font-semibold tracking-normal text-foreground">
+                          {receipt.property.name}
+                        </h3>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {getTenantLabel(receipt)} -{" "}
+                          {formatDate(receipt.periodStart)} au{" "}
+                          {formatDate(receipt.periodEnd)}
+                        </p>
+                        <div className="mt-3">
+                          <StatusBadge
+                            tone={getReceiptStatusTone(receipt.status)}
+                          >
+                            {receiptStatusLabels[receipt.status] ??
+                              receipt.status}
+                          </StatusBadge>
+                        </div>
+                      </div>
+                      <div className="space-y-3 sm:text-right">
+                        <p className="font-semibold text-foreground">
+                          {formatMoney(
+                            receipt.totalAmountInCents,
+                            receipt.currency,
+                          )}
+                        </p>
+                        <Link
+                          className={buttonVariants({
+                            variant: "outline",
+                            size: "sm",
+                          })}
+                          href={`/owner/properties/${receipt.property.id}/contracts/${receipt.rentalContract.id}?focus=receipt-${receipt.id}`}
                         >
-                          {receiptStatusLabels[receipt.status] ??
-                            receipt.status}
-                        </StatusBadge>
+                          Traiter la demande
+                        </Link>
                       </div>
                     </div>
-                    <div className="space-y-3 sm:text-right">
-                      <p className="font-semibold text-foreground">
-                        {formatMoney(
-                          receipt.totalAmountInCents,
-                          receipt.currency,
-                        )}
-                      </p>
-                      <Link
-                        className={buttonVariants({
-                          variant: "outline",
-                          size: "sm",
-                        })}
-                        href={`/owner/properties/${receipt.property.id}/contracts/${receipt.rentalContract.id}?focus=receipt-${receipt.id}`}
-                      >
-                        Traiter la demande
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              </SpotlightCard>
-            ))}
+                  </article>
+                </SpotlightCard>
+              );
+            })}
           </div>
         )}
       </section>
