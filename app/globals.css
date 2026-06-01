@@ -141,6 +141,71 @@
 }
 
 @layer utilities {
+  .landing-page {
+    --landing-bg: #eef7f5;
+    --landing-bg-strong: #f3faf8;
+    --landing-section: #e7f2ef;
+    --landing-surface: rgb(255 255 255 / 0.84);
+    --landing-surface-muted: rgb(250 255 253 / 0.72);
+    --landing-surface-strong: rgb(255 255 255 / 0.9);
+    --landing-inline-surface: rgb(15 143 130 / 0.08);
+    --landing-hover-surface: rgb(15 143 130 / 0.13);
+    --landing-text: #0b1f26;
+    --landing-muted: #4d6268;
+    --landing-muted-strong: #31494f;
+    --landing-border: rgb(136 166 160 / 0.36);
+    --landing-border-strong: rgb(15 143 130 / 0.42);
+    --landing-accent: #0f8f82;
+    --landing-accent-strong: #167c74;
+    --landing-cyan: #1e9ab0;
+    --landing-warning: #b7812f;
+    --landing-nav-bg: rgb(250 255 253 / 0.76);
+    --landing-card-shadow: 0 24px 80px rgb(11 31 38 / 0.12);
+  }
+
+  .dark .landing-page {
+    --landing-bg: #071a20;
+    --landing-bg-strong: #0f3443;
+    --landing-section: #0a232b;
+    --landing-surface: rgb(16 44 54 / 0.72);
+    --landing-surface-muted: rgb(16 44 54 / 0.58);
+    --landing-surface-strong: rgb(7 26 32 / 0.72);
+    --landing-inline-surface: rgb(255 255 255 / 0.04);
+    --landing-hover-surface: rgb(255 255 255 / 0.08);
+    --landing-text: #f5f1e8;
+    --landing-muted: #a8b8be;
+    --landing-muted-strong: #c2cdd1;
+    --landing-border: rgb(255 255 255 / 0.1);
+    --landing-border-strong: rgb(143 216 200 / 0.35);
+    --landing-accent: #8fd8c8;
+    --landing-accent-strong: #7bc4b8;
+    --landing-cyan: #6bc6d9;
+    --landing-warning: #d8a85f;
+    --landing-nav-bg: rgb(7 26 32 / 0.72);
+    --landing-card-shadow: 0 24px 80px rgb(0 0 0 / 0.24);
+  }
+
+  .landing-hero-bg {
+    background: linear-gradient(
+      135deg,
+      var(--landing-bg) 0%,
+      var(--landing-section) 44%,
+      var(--landing-bg-strong) 100%
+    );
+  }
+
+  .landing-plan-details summary {
+    list-style: none;
+  }
+
+  .landing-plan-details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .landing-plan-details[open] .landing-plan-chevron {
+    transform: rotate(180deg);
+  }
+
   .landing-fade-up,
   .landing-fade-up-delay-1,
   .landing-fade-up-delay-2 {
@@ -252,21 +317,34 @@
     background:
       radial-gradient(
         circle at 50% 12%,
-        rgb(143 216 200 / 0.16),
+        color-mix(in srgb, var(--landing-accent) 18%, transparent),
         transparent 34rem
       ),
       radial-gradient(
         circle at 82% 70%,
-        rgb(216 168 95 / 0.12),
+        color-mix(in srgb, var(--landing-warning) 14%, transparent),
         transparent 24rem
       ),
-      linear-gradient(180deg, #0a232b 0%, #102c36 44%, #071a20 100%);
+      linear-gradient(
+        180deg,
+        var(--landing-section) 0%,
+        var(--landing-surface-muted) 44%,
+        var(--landing-bg) 100%
+      );
   }
 
   .landing-cta-glow {
     box-shadow:
       0 36px 110px rgb(7 26 32 / 0.55),
       0 0 90px rgb(123 196 184 / 0.16);
+  }
+
+  .landing-cta-inner-glow {
+    background: radial-gradient(
+      circle at 50% 0%,
+      color-mix(in srgb, var(--landing-accent) 24%, transparent),
+      transparent 40%
+    );
   }
 
   .landing-shine {

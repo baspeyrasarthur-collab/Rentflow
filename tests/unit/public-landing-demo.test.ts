@@ -48,10 +48,20 @@ describe("public landing and demo entry path", () => {
     expect(pageSource).toContain("landing-line-flow");
     expect(pageSource).toContain("LandingThemeToggle");
     expect(pageSource).toContain("Fonctionnalités incluses");
+    expect(pageSource).toContain("landing-plan-details");
+    expect(pageSource).toContain("ChevronDown");
     expect(pageSource).toContain("Free");
     expect(pageSource).toContain("Pro");
     expect(pageSource).toContain("Scale");
+    expect(pageSource).toContain("Le plus adapté");
+    expect(pageSource).toContain("Multi-biens");
+    expect(pageSource).toContain("Premières actions à faire");
+    expect(pageSource).toContain("Gestion de plusieurs biens");
+    expect(pageSource).toContain("Support renforcé");
+    expect(pageSource).toContain("Organisation avancée multi-biens");
+    expect(pageSource).toContain("Vue consolidée du portefeuille");
     expect(pageSource).toContain("tracking-[-0.06em]");
+    expect(pageSource).toContain("BrandLogo");
     expect(pageSource).not.toContain("Contacter mon propriétaire");
     expect(pageSource).not.toContain(
       "Une demande claire, sans chat ni pièces jointes en V1.",
@@ -66,6 +76,22 @@ describe("public landing and demo entry path", () => {
     expect(themeToggleSource).toContain("Activer le mode clair");
     expect(themeToggleSource).toContain("Activer le mode sombre");
     expect(themeToggleSource).toContain("rentflow-theme");
+    expect(themeToggleSource).toContain("var(--landing-text)");
+  });
+
+  it("defines a readable light and dark landing palette", () => {
+    const pageSource = readWorkspaceFile("app/page.tsx");
+    const globalCssSource = readWorkspaceFile("app/globals.css");
+
+    expect(pageSource).toContain("landing-page");
+    expect(pageSource).toContain("bg-[var(--landing-bg)]");
+    expect(pageSource).toContain("text-[var(--landing-text)]");
+    expect(pageSource).toContain("bg-[var(--landing-nav-bg)]");
+    expect(globalCssSource).toContain("--landing-bg: #eef7f5");
+    expect(globalCssSource).toContain("--landing-text: #0b1f26");
+    expect(globalCssSource).toContain(".dark .landing-page");
+    expect(globalCssSource).toContain("--landing-bg: #071a20");
+    expect(globalCssSource).toContain(".landing-plan-details[open]");
   });
 
   it("uses an IntersectionObserver driven scroll reveal animation", () => {

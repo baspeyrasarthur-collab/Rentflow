@@ -52,7 +52,7 @@ export function LandingThemeToggle() {
         variant: "outline",
         size: "icon-sm",
         className:
-          "border-white/12 bg-white/[0.03] text-[#F5F1E8] hover:bg-white/[0.07]",
+          "border-[var(--landing-border)] bg-[var(--landing-inline-surface)] text-[var(--landing-text)] hover:bg-[var(--landing-hover-surface)]",
       })}
       onClick={toggleTheme}
       title={isDarkTheme ? "Mode clair" : "Mode sombre"}

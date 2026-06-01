@@ -17,7 +17,6 @@ import {
   Users,
   UserPlus,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -28,6 +27,7 @@ import {
   type ReactNode,
 } from "react";
 
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -200,29 +200,18 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
         <Link
           aria-label="RentFlow"
           className={cn(
-            "flex items-center gap-3 rounded-lg py-2 text-lg font-semibold tracking-normal text-foreground",
+            "flex items-center rounded-lg py-2 transition-opacity hover:opacity-90",
             isSidebarCollapsed ? "justify-center px-0" : "px-2",
           )}
           href="/demo"
           title="RentFlow"
         >
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-primary/45 bg-primary/16 shadow-sm shadow-primary/10 ring-1 ring-white/5">
-            <Image
-              alt="RentFlow"
-              className="size-7 object-contain drop-shadow-sm"
-              height={28}
-              src="/brand/logo-rentflow.png"
-              width={28}
-            />
-          </span>
-          <span
-            className={cn(
-              "text-xl font-semibold leading-none tracking-normal",
-              isSidebarCollapsed && "sr-only",
-            )}
-          >
-            RentFlow
-          </span>
+          <BrandLogo
+            iconClassName="size-12"
+            priority
+            showWordmark={!isSidebarCollapsed}
+            wordmarkClassName="h-8 w-32"
+          />
         </Link>
 
         <div
@@ -379,17 +368,16 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
 
       <header className="border-b bg-card/80 backdrop-blur md:hidden">
         <div className="flex min-h-16 items-center justify-between gap-4 px-4">
-          <Link className="flex items-center gap-2 font-semibold" href="/demo">
-            <span className="flex size-9 items-center justify-center rounded-lg border border-primary/45 bg-primary/16 shadow-sm shadow-primary/10">
-              <Image
-                alt="RentFlow"
-                className="size-6 object-contain"
-                height={24}
-                src="/brand/logo-rentflow.png"
-                width={24}
-              />
-            </span>
-            <span>RentFlow</span>
+          <Link
+            aria-label="RentFlow"
+            className="flex items-center transition-opacity hover:opacity-90"
+            href="/demo"
+          >
+            <BrandLogo
+              iconClassName="size-10"
+              priority
+              wordmarkClassName="h-7 w-28"
+            />
           </Link>
           <div className="flex items-center gap-2">
             <Link className={buttonVariants({ size: "sm" })} href="/sign-up">

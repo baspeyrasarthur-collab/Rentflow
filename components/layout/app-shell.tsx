@@ -21,6 +21,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { buttonVariants } from "@/components/ui/button";
 import type { UserRole } from "@/features/auth/types";
 import { cn } from "@/lib/utils";
@@ -237,29 +238,18 @@ export function AppShell({
         <Link
           aria-label="RentFlow"
           className={cn(
-            "flex items-center gap-3 rounded-lg py-2 text-lg font-semibold tracking-normal text-foreground",
+            "flex items-center rounded-lg py-2 transition-opacity hover:opacity-90",
             isSidebarCollapsed ? "justify-center px-0" : "px-2",
           )}
           href={homeHref}
           title="RentFlow"
         >
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-primary/45 bg-primary/16 shadow-sm shadow-primary/10 ring-1 ring-white/5">
-            <Image
-              alt="RentFlow"
-              className="size-7 object-contain drop-shadow-sm"
-              height={28}
-              src="/brand/logo-rentflow.png"
-              width={28}
-            />
-          </span>
-          <span
-            className={cn(
-              "text-xl font-semibold leading-none tracking-normal",
-              isSidebarCollapsed && "sr-only",
-            )}
-          >
-            RentFlow
-          </span>
+          <BrandLogo
+            iconClassName="size-12"
+            priority
+            showWordmark={!isSidebarCollapsed}
+            wordmarkClassName="h-8 w-32"
+          />
         </Link>
 
         <div className="mt-5 min-h-0 flex-1 overflow-hidden">
@@ -407,19 +397,15 @@ export function AppShell({
       <header className="border-b bg-card/80 backdrop-blur md:hidden">
         <div className="flex min-h-16 items-center justify-between gap-4 px-4">
           <Link
-            className="flex items-center gap-2 font-semibold"
+            aria-label="RentFlow"
+            className="flex items-center transition-opacity hover:opacity-90"
             href={homeHref}
           >
-            <span className="flex size-9 items-center justify-center rounded-lg border border-primary/45 bg-primary/16 shadow-sm shadow-primary/10">
-              <Image
-                alt="RentFlow"
-                className="size-6 object-contain"
-                height={24}
-                src="/brand/logo-rentflow.png"
-                width={24}
-              />
-            </span>
-            <span>RentFlow</span>
+            <BrandLogo
+              iconClassName="size-10"
+              priority
+              wordmarkClassName="h-7 w-28"
+            />
           </Link>
           <div className="flex items-center gap-2">
             <Link
