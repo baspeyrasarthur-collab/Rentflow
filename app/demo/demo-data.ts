@@ -743,6 +743,13 @@ export const demoAppData = {
         status: "Ouverte",
         tone: "warning",
       },
+      {
+        id: "request-refused",
+        title: "Changement de serrure immédiat",
+        category: "Travaux / réparation",
+        status: "Refusée",
+        tone: "danger",
+      },
     ],
     formerContract: {
       propertyName: "Studio République",

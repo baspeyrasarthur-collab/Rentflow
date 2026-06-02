@@ -31,6 +31,8 @@ import { BrandLogo } from "@/components/brand/brand-logo";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+import { DemoResetButton } from "./demo-interactions";
+
 type DemoLayoutProps = {
   children: ReactNode;
 };
@@ -312,6 +314,13 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
             Tester avec vos données
           </p>
           <div className={cn("grid gap-2", isSidebarCollapsed && "gap-1")}>
+            <DemoResetButton
+              className={cn(
+                "w-full",
+                isSidebarCollapsed &&
+                  "size-8 justify-center rounded-lg p-0 [&_svg]:size-4",
+              )}
+            />
             <Link
               aria-label="Créer un compte"
               className={buttonVariants({
@@ -383,6 +392,7 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
             <Link className={buttonVariants({ size: "sm" })} href="/sign-up">
               Créer un compte
             </Link>
+            <DemoResetButton className="hidden sm:inline-flex" />
             <Link
               className={buttonVariants({
                 variant: "outline",
@@ -489,6 +499,7 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
             <ArrowLeftRight className="size-4" />
             {switchLabel}
           </Link>
+          <DemoResetButton className="h-10 rounded-full px-4" />
           <Link
             className={topActionClassName}
             href="/"

@@ -14,7 +14,6 @@ import {
   Send,
   UserPlus,
   WalletCards,
-  Wrench,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -32,6 +31,12 @@ import { formatMoney, formatSignedMoney } from "@/lib/money";
 import { cn } from "@/lib/utils";
 
 import { demoAppData } from "./demo-data";
+import {
+  DemoInlinePanel,
+  DemoResetButton,
+  DemoSimulatedAction,
+  DemoTenantRequestComposer,
+} from "./demo-interactions";
 
 type DemoMode = "owner" | "tenant";
 type OwnerDemoPage =
@@ -232,6 +237,7 @@ function DemoHeader({
             <ArrowLeftRight className="size-4" />
             {switchLabel}
           </Link>
+          <DemoResetButton />
           <Link
             className={buttonVariants({ variant: "outline" })}
             href="/sign-in"
@@ -343,6 +349,27 @@ function PaymentRow({
             {formatMoney(payment.amountInCents)}
           </p>
         </div>
+        {payment.status === "Déclaré payé" ? (
+          <div className="mt-5">
+            <DemoSimulatedAction
+              confirmLabel="Confirmer fictivement la réception du loyer ?"
+              doneLabel="Réception confirmée dans la démo"
+              label="Confirmer la réception"
+              tone="warning"
+            />
+          </div>
+        ) : null}
+        {payment.status === "Prévu" ? (
+          <div className="mt-5">
+            <DemoInlinePanel
+              title="Détail fictif du paiement prévu"
+              triggerLabel="Voir détail"
+            >
+              Le paiement reste prévu dans la démo. Le vrai suivi se fait dans
+              l&apos;espace propriétaire connecté.
+            </DemoInlinePanel>
+          </div>
+        ) : null}
       </article>
     </SpotlightCard>
   );
@@ -387,6 +414,25 @@ function OwnerDashboardDemo() {
             title="Demande locataire"
             tone="success"
             value={3}
+          />
+        </div>
+        <div className="grid gap-3 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-3">
+          <DemoSimulatedAction
+            confirmLabel="Simuler la confirmation du loyer déclaré payé ?"
+            doneLabel="Paiement confirmé"
+            label="Confirmer un loyer déclaré payé"
+            tone="warning"
+          />
+          <DemoSimulatedAction
+            confirmLabel="Simuler la génération de la quittance demandée ?"
+            doneLabel="Quittance générée"
+            label="Générer une quittance demandée"
+            tone="success"
+          />
+          <DemoSimulatedAction
+            confirmLabel="Simuler le traitement de la demande locataire ?"
+            doneLabel="Demande déplacée en activité récente"
+            label="Répondre à une demande locataire"
           />
         </div>
       </section>
@@ -590,6 +636,98 @@ function OwnerPropertyDetailDemo() {
           </div>
         </section>
       </section>
+      <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+        <article className="rounded-xl border bg-card p-5 shadow-sm">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="font-semibold">Photo du logement</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Upload fictif : la vraie app conserve une photo optionnelle par
+                bien.
+              </p>
+            </div>
+            <StatusBadge tone="info">Simulation</StatusBadge>
+          </div>
+          <div className="mt-4">
+            <DemoSimulatedAction
+              doneLabel="Photo remplacée dans la démo"
+              label="Ajouter/remplacer photo"
+              tone="success"
+            />
+          </div>
+        </article>
+        <div className="grid gap-4">
+          <article className="rounded-xl border bg-card p-5 shadow-sm">
+            <div className="flex items-start justify-between gap-4">
+              <h2 className="font-semibold">Adresse</h2>
+              <DemoInlinePanel
+                title="Edition fictive de l'adresse"
+                triggerLabel="Modifier les informations"
+              >
+                Le formulaire réel permet de corriger l&apos;adresse du
+                logement. Dans la démo, ce panneau confirme seulement le
+                parcours.
+              </DemoInlinePanel>
+            </div>
+            <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+              <div>
+                <dt className="text-muted-foreground">Adresse</dt>
+                <dd className="font-medium">{property.address}</dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">Ville</dt>
+                <dd className="font-medium">{property.city}</dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">Pays</dt>
+                <dd className="font-medium">France</dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">Code postal</dt>
+                <dd className="font-medium">75010</dd>
+              </div>
+            </dl>
+          </article>
+          <article className="rounded-xl border bg-card p-5 shadow-sm">
+            <div className="flex items-start justify-between gap-4">
+              <h2 className="font-semibold">Caractéristiques</h2>
+              <DemoInlinePanel
+                title="Edition fictive des caractéristiques"
+                triggerLabel="Modifier les caractéristiques"
+              >
+                Surface, type, fiscalité et statut peuvent être vérifiés dans le
+                vrai formulaire. Cette action reste locale à la démo.
+              </DemoInlinePanel>
+            </div>
+            <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
+              <div>
+                <dt className="text-muted-foreground">Statut</dt>
+                <dd className="font-medium">{property.status}</dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">Type</dt>
+                <dd className="font-medium">{property.type}</dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">Surface</dt>
+                <dd className="font-medium">{property.surface}</dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">Meublé</dt>
+                <dd className="font-medium">Oui</dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">Colocation</dt>
+                <dd className="font-medium">Non</dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">Fiscalité</dt>
+                <dd className="font-medium">{property.fiscalType}</dd>
+              </div>
+            </dl>
+          </article>
+        </div>
+      </section>
       <section className="space-y-4">
         <SectionHeader title="Contrats liés" />
         <div className="grid gap-4 lg:grid-cols-2">
@@ -632,15 +770,25 @@ function OwnerContractsDemo() {
                 <p className="mt-2 text-sm text-muted-foreground">
                   {property.contracts} contrat(s) - {property.type}
                 </p>
-                <Link
-                  className={cn(
-                    buttonVariants({ variant: "outline", size: "sm" }),
-                    "mt-5",
-                  )}
-                  href="/sign-up"
-                >
-                  Action simulée
-                </Link>
+                <div className="mt-5 grid gap-3">
+                  <DemoInlinePanel
+                    title="Modification fictive du contrat"
+                    triggerLabel="Modifier le contrat"
+                  >
+                    Le vrai formulaire de contrat sera disponible après création
+                    du compte. Ici, aucune donnée n&apos;est enregistrée.
+                  </DemoInlinePanel>
+                  <DemoSimulatedAction
+                    doneLabel="Invitation fictive envoyée"
+                    label="Inviter un locataire"
+                  />
+                  <DemoSimulatedAction
+                    confirmLabel="Simuler la fin de ce contrat ?"
+                    doneLabel="Contrat déplacé dans les terminés"
+                    label="Mettre fin au contrat"
+                    tone="warning"
+                  />
+                </div>
               </article>
             </SpotlightCard>
           ))}
@@ -677,21 +825,43 @@ function OwnerReceiptsDemo() {
         <SectionHeader title="Quittances" />
         <div className="grid gap-4 lg:grid-cols-3">
           {demoAppData.owner.receipts.map((receipt) => (
-            <ActionCard
-              actionLabel={
-                receipt.status === "Demandée" ? "Générer (démo)" : "Voir"
-              }
-              description={`${receipt.tenantName} - ${receipt.propertyName} - ${receipt.month}`}
-              href={
-                receipt.status === "Demandée"
-                  ? "/sign-up"
-                  : "/demo?mode=owner&page=receipts"
-              }
-              icon={<ReceiptText className="size-5" />}
+            <SpotlightCard
               key={receipt.id}
-              title={receipt.status}
               tone={receipt.statusTone as CardTone}
-            />
+            >
+              <article className="h-full rounded-xl border bg-card p-5 shadow-sm">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <StatusBadge tone={receipt.statusTone as BadgeTone}>
+                      {receipt.status}
+                    </StatusBadge>
+                    <h3 className="mt-3 font-semibold">{receipt.tenantName}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {receipt.propertyName} - {receipt.month}
+                    </p>
+                  </div>
+                  <ReceiptText className="size-5 text-primary" />
+                </div>
+                <div className="mt-5">
+                  {receipt.status === "Demandée" ? (
+                    <DemoSimulatedAction
+                      confirmLabel="Simuler la génération de cette quittance ?"
+                      doneLabel="Quittance générée"
+                      label="Générer la quittance"
+                      tone="success"
+                    />
+                  ) : (
+                    <DemoInlinePanel
+                      title="Aperçu PDF fictif"
+                      triggerLabel="Ouvrir PDF"
+                    >
+                      La démo n&apos;ouvre pas de PDF réel. Créez un compte pour
+                      générer des quittances avec vos données.
+                    </DemoInlinePanel>
+                  )}
+                </div>
+              </article>
+            </SpotlightCard>
           ))}
         </div>
       </section>
@@ -724,6 +894,21 @@ function OwnerFinancesDemo() {
             label="Biens inclus"
             value={owner.summary.propertiesCount}
           />
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <DemoSimulatedAction
+            doneLabel="Export fictif préparé"
+            label="Exporter mes finances"
+            tone="success"
+          />
+          <DemoInlinePanel
+            title="Ajout fictif d'une dépense"
+            triggerLabel="Ajouter une dépense"
+          >
+            Les dépenses réelles restent liées aux biens du propriétaire et ne
+            sont pas modifiées dans la démo. Les frais RentFlow ne sont pas
+            inclus comme dépenses locatives.
+          </DemoInlinePanel>
         </div>
       </section>
       <section className="grid gap-4 lg:grid-cols-2">
@@ -783,7 +968,7 @@ function OwnerDeclarationsDemo() {
         <div className="grid gap-4 lg:grid-cols-2">
           {declarations.missingItems.map((item) => (
             <ActionCard
-              actionLabel="Voir le logement"
+              actionLabel="Compléter ce logement"
               description="Lien direct fictif vers l'endroit où corriger la donnée dans l'app réelle."
               href="/demo?mode=owner&page=property-detail"
               icon={<Building2 className="size-5" />}
@@ -792,6 +977,14 @@ function OwnerDeclarationsDemo() {
               tone="warning"
             />
           ))}
+          <ActionCard
+            actionLabel="Créer un compte"
+            description="Les informations personnelles fiscales restent facultatives et ne sont pas obligatoires dans la démo."
+            href="/sign-up"
+            icon={<UserPlus className="size-5" />}
+            title="Compléter mes informations"
+            tone="info"
+          />
         </div>
       </section>
       <section className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
@@ -842,18 +1035,49 @@ function OwnerTenantsDemo() {
         </div>
       </section>
       <section className="space-y-4">
-        <SectionHeader title="Demandes locataires" />
+        <SectionHeader
+          action={
+            <DemoInlinePanel
+              title="Invitation fictive"
+              triggerLabel="Inviter un locataire"
+            >
+              L&apos;invitation réelle est envoyée depuis l&apos;espace
+              propriétaire connecté. Ici, l&apos;action reste simulée.
+            </DemoInlinePanel>
+          }
+          title="Demandes locataires"
+        />
         <div className="grid gap-4 lg:grid-cols-3">
           {owner.tenantRequests.map((request) => (
-            <ActionCard
-              actionLabel="Fait / Refusé (démo)"
-              description={`${request.tenantName} - ${request.propertyName} - ${request.category}`}
-              href="/sign-up"
-              icon={<Wrench className="size-5" />}
+            <SpotlightCard
               key={request.id}
-              title={request.title}
               tone={request.statusTone as CardTone}
-            />
+            >
+              <article className="h-full rounded-xl border bg-card p-5 shadow-sm">
+                <StatusBadge tone={request.statusTone as BadgeTone}>
+                  {request.status}
+                </StatusBadge>
+                <h3 className="mt-3 font-semibold">{request.title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {request.tenantName} - {request.propertyName} -{" "}
+                  {request.category}
+                </p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <DemoSimulatedAction
+                    confirmLabel="Marquer cette demande comme traitée ?"
+                    doneLabel="Demande traitée"
+                    label="Fait"
+                    tone="success"
+                  />
+                  <DemoSimulatedAction
+                    confirmLabel="Refuser fictivement cette demande ?"
+                    doneLabel="Demande refusée"
+                    label="Refusé"
+                    tone="danger"
+                  />
+                </div>
+              </article>
+            </SpotlightCard>
           ))}
         </div>
       </section>
@@ -871,15 +1095,36 @@ function TenantDashboardDemo() {
         <SectionHeader title="À faire maintenant" />
         <div className="grid gap-4 lg:grid-cols-3">
           {tenant.actions.map((action) => (
-            <ActionCard
-              actionLabel="Action simulée"
-              description={action.description}
-              href="/sign-up"
-              icon={<WalletCards className="size-5" />}
-              key={action.id}
-              title={action.title}
-              tone={action.tone as CardTone}
-            />
+            <SpotlightCard key={action.id} tone={action.tone as CardTone}>
+              <article className="h-full rounded-xl border bg-card p-5 shadow-sm">
+                <WalletCards className="size-5 text-primary" />
+                <h3 className="mt-3 font-semibold">{action.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {action.description}
+                </p>
+                <div className="mt-5">
+                  {action.id === "declare-paid" ? (
+                    <DemoSimulatedAction
+                      confirmLabel="Déclarer fictivement ce loyer comme payé ?"
+                      doneLabel="Loyer déclaré payé"
+                      label="Déclarer mon loyer payé"
+                      tone="warning"
+                    />
+                  ) : action.id === "receipt-seen" ? (
+                    <DemoSimulatedAction
+                      doneLabel="Quittance marquée comme vue"
+                      label="Marquer comme vue"
+                    />
+                  ) : (
+                    <DemoSimulatedAction
+                      doneLabel="Réponse confirmée"
+                      label="Confirmer"
+                      tone="success"
+                    />
+                  )}
+                </div>
+              </article>
+            </SpotlightCard>
           ))}
         </div>
       </section>
@@ -940,6 +1185,23 @@ function TenantDashboardDemo() {
           <QuickActionGrid actions={tenantQuickActions} />
         </section>
       </section>
+      <section className="rounded-xl border bg-card p-5 shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-semibold">Fin de contrat</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Action simulée : aucune demande réelle n&apos;est envoyée au
+              propriétaire.
+            </p>
+          </div>
+          <DemoSimulatedAction
+            confirmLabel="Simuler une demande de fin de contrat ?"
+            doneLabel="Demande de fin envoyée dans la démo"
+            label="Demander la fin du contrat"
+            tone="warning"
+          />
+        </div>
+      </section>
       <TenantPaymentsAndReceipts />
     </>
   );
@@ -985,6 +1247,14 @@ function TenantPaymentsAndReceipts() {
                 <StatusBadge className="mt-2" tone={receipt.tone as BadgeTone}>
                   {receipt.status}
                 </StatusBadge>
+                {receipt.status === "Disponible" ? (
+                  <div className="mt-4">
+                    <DemoSimulatedAction
+                      doneLabel="Quittance vue"
+                      label="J'ai consulté la quittance"
+                    />
+                  </div>
+                ) : null}
               </article>
             </SpotlightCard>
           ))}
@@ -1054,19 +1324,8 @@ function TenantRequestsDemo() {
             Formulaire fictif : l&apos;envoi réel est disponible après création
             du compte.
           </p>
-          <div className="mt-5 grid gap-3">
-            <div className="rounded-lg border bg-muted/30 px-3 py-2 text-sm">
-              Sujet : Problème ou question
-            </div>
-            <div className="rounded-lg border bg-muted/30 px-3 py-2 text-sm">
-              Type de demande : Document, paiement, travaux...
-            </div>
-            <div className="min-h-24 rounded-lg border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
-              Message de démonstration.
-            </div>
-            <Link className={buttonVariants()} href="/sign-up">
-              Envoyer la demande (démo)
-            </Link>
+          <div className="mt-5">
+            <DemoTenantRequestComposer />
           </div>
         </article>
         <section className="space-y-4">
@@ -1081,6 +1340,20 @@ function TenantRequestsDemo() {
                 <p className="mt-1 text-sm text-muted-foreground">
                   {request.category}
                 </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {request.status === "Traitée par le propriétaire" ? (
+                    <DemoSimulatedAction
+                      doneLabel="Demande confirmée"
+                      label="Confirmer"
+                      tone="success"
+                    />
+                  ) : request.status === "Refusée" ? (
+                    <DemoSimulatedAction
+                      doneLabel="Refus archivé"
+                      label="J'ai compris"
+                    />
+                  ) : null}
+                </div>
               </article>
             </SpotlightCard>
           ))}
@@ -1097,7 +1370,7 @@ function TenantAccountDemo() {
     <>
       <DemoNotice />
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <article className="rounded-xl border bg-card p-5">
+        <article className="rounded-xl border bg-card p-5 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="flex size-16 items-center justify-center rounded-2xl border bg-primary/16 text-xl font-semibold text-primary">
               LM
@@ -1109,17 +1382,53 @@ function TenantAccountDemo() {
               </p>
             </div>
           </div>
+          <div className="mt-5 grid gap-3">
+            <DemoSimulatedAction
+              doneLabel="Photo fictive mise à jour"
+              label="Ajouter/remplacer photo"
+            />
+            <DemoInlinePanel
+              title="Espace sécurisé fictif"
+              triggerLabel="Gérer mes identifiants"
+            >
+              Dans l&apos;app réelle, email et mot de passe sont gérés par
+              l&apos;espace d&apos;authentification sécurisé.
+            </DemoInlinePanel>
+          </div>
         </article>
-        <article className="rounded-xl border bg-card p-5">
+        <article className="rounded-xl border bg-card p-5 shadow-sm">
           <h3 className="font-semibold">Informations personnelles</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Facultatives dans l&apos;app réelle, non modifiables dans la démo.
+            Facultatives dans l&apos;app réelle, modifiables localement dans la
+            démo.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <StatCard label="Prénom" value="Léa" />
             <StatCard label="Nom" value="Martin" />
             <StatCard label="Espace" value="Locataire" />
             <StatCard label="Propriétaire" value={tenant.ownerName} />
+          </div>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <DemoSimulatedAction
+              doneLabel="Informations enregistrées dans la démo"
+              label="Enregistrer les informations"
+              tone="success"
+            />
+            <span className="inline-flex items-center rounded-lg border bg-muted/40 px-3 py-1.5 text-sm font-medium">
+              Changer d&apos;espace
+            </span>
+            <Link
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+              href="/demo?mode=owner&page=dashboard"
+            >
+              Ouvrir l&apos;espace propriétaire
+            </Link>
+            <Link
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+              href="/support"
+            >
+              Contacter le support
+            </Link>
           </div>
         </article>
       </section>

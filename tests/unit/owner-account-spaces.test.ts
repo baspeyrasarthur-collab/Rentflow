@@ -122,14 +122,13 @@ describe("owner account space switcher", () => {
     expect(text).toContain("FREE");
     expect(text).toContain("Informations personnelles");
     expect(text).toContain("Espace proprietaire");
+    expect(text).toContain("Gerez vos biens, contrats et paiements.");
     expect(text).toContain("Espace locataire");
     expect(text).toContain("Disponible");
     expect(text).toContain("Ouvrir l'espace locataire");
     expect(text).toContain("Ajouter une photo");
     expect(text).toContain("Gérer mes identifiants");
-    expect(text).toContain(
-      "Vos identifiants sont sécurisés par l'espace d'authentification",
-    );
+    expect(text).toContain("Gerez vos identifiants dans l'espace securise.");
     expect(text).not.toContain(
       "RentFlow ne propose pas de mutation email ou mot de passe custom depuis cette page",
     );
@@ -151,8 +150,10 @@ describe("owner account space switcher", () => {
     expect(text).toContain("Creer mon espace locataire gratuit");
     expect(text).toContain("Photo de profil");
     expect(text).not.toContain("Non requises aujourd'hui");
-    expect(text).toContain("Votre espace proprietaire restera inchange");
-    expect(text).toContain("meme email et le meme mot de passe");
+    expect(text).toContain("Creez votre espace locataire avec le meme compte.");
+    expect(text).not.toContain("Votre espace proprietaire restera inchange");
+    expect(text).not.toContain("meme email et le meme mot de passe");
+    expect(text).not.toContain("Vous pourrez aussi etre rattache");
     expect(hrefs).toContain("/owner");
     expect(hrefs).not.toContain("/tenant");
   });
@@ -195,6 +196,7 @@ describe("owner account space switcher", () => {
 
     expect(ownerSource).toContain("lg:grid-cols-2");
     expect(ownerSource).toContain('=== "personal-info"');
+    expect(ownerSource).not.toContain("min-w-0 break-all");
     expect(formSource).toContain("Enregistrer les informations");
     expect(formSource).toContain("Action ciblee");
   });

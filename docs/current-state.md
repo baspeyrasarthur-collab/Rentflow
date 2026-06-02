@@ -61,6 +61,7 @@
 - Landing publique V1 : `/` presente RentFlow comme un copilote de gestion locative guidee, avec CTA principal `Voir le site` vers `/demo`, CTA de creation de compte et lien de connexion.
 - Parcours public cible : landing -> demo -> creation/connexion -> onboarding role -> plan proprietaire si applicable -> dashboard ; `/dashboard` continue de rediriger les utilisateurs connectes vers leur espace reel.
 - Demo publique V2 : `/demo` simule les vraies pages avec query params `mode=owner|tenant` et `page=...` au lieu de pousser le visiteur vers les routes protegees.
+- Demo publique V3 : `/demo` fonctionne comme une fausse app interactive avec actions simulees localement, bouton de reinitialisation, navigation owner/tenant et donnees fictives uniquement pour tester RentFlow avant creation de compte.
 - Demo publique V2 : pages owner simulees dans `/demo` : dashboard, biens, detail logement, contrats, paiements, quittances, finances, declarations et locataires.
 - Demo publique V2 : pages tenant simulees dans `/demo` : dashboard, detail contrat, demandes au proprietaire et compte.
 - Demo publique V2 : donnees fictives centralisees dans `app/demo/demo-data.ts`, aucune donnee reelle, aucun Prisma, aucun `requireRole`, aucun Clerk obligatoire, aucune server action, aucune mutation metier et aucun provider.

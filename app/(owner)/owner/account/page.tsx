@@ -14,7 +14,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { PersonalInfoForm } from "@/components/account/personal-info-form";
 import { ProfileImageRemoveConfirm } from "@/components/account/profile-image-remove-confirm";
 import {
-  InfoAlert,
   OwnerQuickActions,
   PageHeader,
   ScrollToFocus,
@@ -275,8 +274,7 @@ export default async function OwnerAccountPage({
                     <StatusBadge tone="success">Disponible</StatusBadge>
                   </div>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    Gere les biens, contrats, paiements, quittances et finances
-                    rattaches a votre profil proprietaire.
+                    Gerez vos biens, contrats et paiements.
                   </p>
                 </div>
                 <Link
@@ -303,8 +301,8 @@ export default async function OwnerAccountPage({
                   </div>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     {tenantProfile
-                      ? "Consultez vos locations, paiements, quittances et documents locataire."
-                      : "Votre espace proprietaire restera inchange. Vous utiliserez le meme email et le meme mot de passe."}
+                      ? "Consultez vos logements, contrats et quittances."
+                      : "Creez votre espace locataire avec le meme compte."}
                   </p>
                 </div>
                 {tenantProfile ? (
@@ -328,12 +326,6 @@ export default async function OwnerAccountPage({
                   </form>
                 )}
               </div>
-              {!tenantProfile ? (
-                <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                  Vous pourrez aussi etre rattache a un logement plus tard via
-                  une invitation proprietaire.
-                </p>
-              ) : null}
             </article>
           </SpotlightCard>
         </div>
@@ -344,27 +336,26 @@ export default async function OwnerAccountPage({
           title="Profil et securite"
           description="Photo de profil, identifiants et informations facultatives de votre compte."
         />
-        <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
           <article className="h-full rounded-xl border border-primary/45 bg-primary/10 p-5 text-card-foreground shadow-sm shadow-black/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-xl hover:shadow-black/15">
-            <div className="grid gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(280px,0.8fr)]">
-              <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start">
+            <div className="space-y-4">
+              <div className="flex min-w-0 gap-4">
                 <ProfileImagePreview
                   displayName={displayName}
                   imageUrl={user.profileImageUrl}
                 />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="min-w-0 truncate font-semibold tracking-normal text-foreground">
-                      Profil utilisateur
+                    <h2 className="min-w-0 truncate text-lg font-semibold tracking-normal text-foreground">
+                      {displayName}
                     </h2>
                     <StatusBadge tone="success">Actif</StatusBadge>
                   </div>
-                  <p className="mt-2 min-w-0 break-all text-sm leading-6 text-muted-foreground">
-                    <span className="font-medium text-foreground">
-                      {displayName}
-                    </span>
-                    <span className="mx-2 text-muted-foreground/70">-</span>
+                  <p className="mt-1 truncate text-sm leading-6 text-muted-foreground">
                     {user.email}
+                  </p>
+                  <p className="mt-2 text-xs font-medium uppercase tracking-wide text-primary">
+                    Profil utilisateur
                   </p>
                 </div>
               </div>
@@ -383,9 +374,9 @@ export default async function OwnerAccountPage({
                   </div>
                   <form
                     action={updateOwnerAccountProfileImageAction}
-                    className="mt-3 space-y-2"
+                    className="mt-3 space-y-3"
                   >
-                    <label className="grid min-w-0 gap-2 text-xs leading-5 text-muted-foreground">
+                    <label className="grid min-w-0 gap-2 text-xs leading-5 text-muted-foreground lg:grid-cols-[10rem_1fr] lg:items-center">
                       <span>
                         {user.profileImageUrl
                           ? "Remplacer la photo"
@@ -399,9 +390,6 @@ export default async function OwnerAccountPage({
                         type="file"
                       />
                     </label>
-                    <p className="text-xs leading-5 text-muted-foreground">
-                      JPG, PNG, WebP. 5 Mo max.
-                    </p>
                     <div className="flex flex-wrap items-center gap-2">
                       <button
                         className={buttonVariants({ size: "sm" })}
@@ -417,6 +405,9 @@ export default async function OwnerAccountPage({
                         />
                       ) : null}
                     </div>
+                    <p className="text-xs leading-5 text-muted-foreground">
+                      JPG, PNG, WebP · 5 Mo max.
+                    </p>
                   </form>
                 </div>
 
@@ -424,10 +415,10 @@ export default async function OwnerAccountPage({
                   <p className="text-xs text-muted-foreground">
                     Identite du compte
                   </p>
-                  <p className="mt-2 text-sm font-medium text-foreground">
+                  <p className="mt-2 truncate text-sm font-medium text-foreground">
                     {displayName}
                   </p>
-                  <p className="mt-2 break-all text-xs leading-5 text-muted-foreground">
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">
                     La photo et les informations personnelles sont communes a
                     vos espaces proprietaire et locataire.
                   </p>
@@ -445,23 +436,20 @@ export default async function OwnerAccountPage({
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="font-semibold tracking-normal text-foreground">
-                      Identifiants
+                      Email et mot de passe
                     </h2>
-                    <StatusBadge tone="info">Auth securisee</StatusBadge>
+                    <StatusBadge tone="info">Securise</StatusBadge>
                   </div>
                   <p className="mt-2 break-all text-sm leading-6 text-muted-foreground">
                     {user.email}
                   </p>
-                  <InfoAlert className="mt-4" title="Email et mot de passe">
-                    <p>
-                      Vos identifiants sont sécurisés par l&apos;espace
-                      d&apos;authentification. Vous pouvez y modifier votre
-                      email, changer votre mot de passe et gérer la récupération
-                      de compte.
+                  <div className="mt-4 space-y-3">
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      Gerez vos identifiants dans l&apos;espace securise.
                     </p>
-                    <p className="mt-2">
-                      La modification de l&apos;email peut nécessiter une
-                      vérification.
+                    <p className="text-xs leading-5 text-muted-foreground">
+                      La modification de l&apos;email peut necessiter une
+                      verification.
                     </p>
                     <Link
                       className={buttonVariants({
@@ -472,7 +460,7 @@ export default async function OwnerAccountPage({
                     >
                       Gérer mes identifiants
                     </Link>
-                  </InfoAlert>
+                  </div>
                 </div>
               </div>
             </article>

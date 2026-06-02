@@ -114,13 +114,12 @@ describe("tenant account page", () => {
     expect(text).toContain("Changer d'espace");
     expect(text).toContain("Informations personnelles");
     expect(text).toContain("Espace proprietaire");
+    expect(text).toContain("Gerez vos biens, contrats et paiements.");
     expect(text).toContain("Disponible");
     expect(text).toContain("Ouvrir l'espace proprietaire");
     expect(text).toContain("Ajouter une photo");
     expect(text).toContain("Gérer mes identifiants");
-    expect(text).toContain(
-      "Vos identifiants sont sécurisés par l'espace d'authentification",
-    );
+    expect(text).toContain("Gerez vos identifiants dans l'espace securise.");
     expect(text).not.toContain(
       "RentFlow ne propose pas de modification email ou mot de passe depuis cette page",
     );
@@ -139,7 +138,7 @@ describe("tenant account page", () => {
     expect(text).toContain("Espace proprietaire");
     expect(text).toContain("Non active");
     expect(text).toContain(
-      "Vous pourrez creer un espace proprietaire depuis le parcours proprietaire.",
+      "Creez votre espace proprietaire depuis le parcours proprietaire.",
     );
     expect(text).not.toContain("Creer mon espace proprietaire");
     expect(hrefs).toContain("/tenant");
@@ -204,9 +203,14 @@ describe("tenant navigation", () => {
       join(process.cwd(), "components/account/personal-info-form.tsx"),
       "utf8",
     );
+    const tenantSource = readFileSync(
+      join(process.cwd(), "app/(tenant)/tenant/account/page.tsx"),
+      "utf8",
+    );
 
     expect(source).toContain("Enregistrer les informations");
     expect(source).toContain("Facultatif");
     expect(source).toContain("taxResidenceCountry");
+    expect(tenantSource).not.toContain("min-w-0 break-all");
   });
 });

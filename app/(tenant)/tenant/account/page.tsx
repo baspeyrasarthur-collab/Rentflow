@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Home, KeyRound, Mail, UserRound } from "lucide-react";
+import { Home, KeyRound, Mail } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { PersonalInfoForm } from "@/components/account/personal-info-form";
@@ -152,7 +152,7 @@ export default async function TenantAccountPage() {
                         Espace locataire disponible
                       </StatusBadge>
                     </div>
-                    <p className="mt-2 break-all text-sm leading-6 text-muted-foreground">
+                    <p className="mt-2 truncate text-sm leading-6 text-muted-foreground">
                       {user.email}
                     </p>
                   </div>
@@ -191,15 +191,14 @@ export default async function TenantAccountPage() {
                     <StatusBadge tone="success">Disponible</StatusBadge>
                   </div>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    Suivez votre logement, vos paiements, vos quittances et les
-                    invitations recues.
+                    Consultez vos logements, contrats et quittances.
                   </p>
                 </div>
                 <Link
                   className={buttonVariants({ variant: "outline", size: "sm" })}
                   href="/tenant"
                 >
-                  Ouvrir
+                  Ouvrir l&apos;espace locataire
                 </Link>
               </div>
             </article>
@@ -219,8 +218,8 @@ export default async function TenantAccountPage() {
                   </div>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     {ownerProfile
-                      ? "Accedez a votre gestion proprietaire avec le meme compte."
-                      : "Vous pourrez creer un espace proprietaire depuis le parcours proprietaire."}
+                      ? "Gerez vos biens, contrats et paiements."
+                      : "Creez votre espace proprietaire depuis le parcours proprietaire."}
                   </p>
                 </div>
                 {ownerProfile ? (
@@ -245,23 +244,26 @@ export default async function TenantAccountPage() {
           description="Photo de profil, identifiants et informations facultatives de votre compte."
           title="Profil et securite"
         />
-        <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
           <article className="h-full rounded-xl border border-primary/45 bg-primary/10 p-5 text-card-foreground shadow-sm shadow-black/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-xl hover:shadow-black/15">
-            <div className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(280px,0.8fr)]">
-              <div className="flex min-w-0 items-start gap-4">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-primary/45 bg-primary/18 text-primary">
-                  <UserRound className="size-5" />
-                </div>
+            <div className="space-y-4">
+              <div className="flex min-w-0 gap-4">
+                <ProfileImagePreview
+                  displayName={displayName}
+                  imageUrl={user.profileImageUrl}
+                />
                 <div className="min-w-0 flex-1">
-                  <h2 className="min-w-0 truncate font-semibold tracking-normal text-foreground">
-                    Profil utilisateur
-                  </h2>
-                  <p className="mt-2 min-w-0 break-all text-sm leading-6 text-muted-foreground">
-                    <span className="font-medium text-foreground">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="min-w-0 truncate text-lg font-semibold tracking-normal text-foreground">
                       {displayName}
-                    </span>
-                    <span className="mx-2 text-muted-foreground/70">-</span>
+                    </h2>
+                    <StatusBadge tone="success">Actif</StatusBadge>
+                  </div>
+                  <p className="mt-1 truncate text-sm leading-6 text-muted-foreground">
                     {user.email}
+                  </p>
+                  <p className="mt-2 text-xs font-medium uppercase tracking-wide text-primary">
+                    Profil utilisateur
                   </p>
                 </div>
               </div>
@@ -280,9 +282,9 @@ export default async function TenantAccountPage() {
                   </div>
                   <form
                     action={updateTenantAccountProfileImageAction}
-                    className="mt-3 space-y-2"
+                    className="mt-3 space-y-3"
                   >
-                    <label className="grid min-w-0 gap-2 text-xs leading-5 text-muted-foreground">
+                    <label className="grid min-w-0 gap-2 text-xs leading-5 text-muted-foreground lg:grid-cols-[10rem_1fr] lg:items-center">
                       <span>
                         {user.profileImageUrl
                           ? "Remplacer la photo"
@@ -296,9 +298,6 @@ export default async function TenantAccountPage() {
                         type="file"
                       />
                     </label>
-                    <p className="text-xs leading-5 text-muted-foreground">
-                      JPG, PNG, WebP. 5 Mo max.
-                    </p>
                     <div className="flex flex-wrap items-center gap-2">
                       <button
                         className={buttonVariants({ size: "sm" })}
@@ -314,6 +313,9 @@ export default async function TenantAccountPage() {
                         />
                       ) : null}
                     </div>
+                    <p className="text-xs leading-5 text-muted-foreground">
+                      JPG, PNG, WebP · 5 Mo max.
+                    </p>
                   </form>
                 </div>
 
@@ -341,23 +343,20 @@ export default async function TenantAccountPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="font-semibold tracking-normal text-foreground">
-                      Identifiants
+                      Email et mot de passe
                     </h2>
-                    <StatusBadge tone="info">Auth existante</StatusBadge>
+                    <StatusBadge tone="info">Securise</StatusBadge>
                   </div>
                   <p className="mt-2 break-all text-sm leading-6 text-muted-foreground">
                     {user.email}
                   </p>
-                  <InfoAlert className="mt-4" title="Email et mot de passe">
-                    <p>
-                      Vos identifiants sont sécurisés par l&apos;espace
-                      d&apos;authentification. Vous pouvez y modifier votre
-                      email, changer votre mot de passe et gérer la récupération
-                      de compte.
+                  <div className="mt-4 space-y-3">
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      Gerez vos identifiants dans l&apos;espace securise.
                     </p>
-                    <p className="mt-2">
-                      La modification de l&apos;email peut nécessiter une
-                      vérification.
+                    <p className="text-xs leading-5 text-muted-foreground">
+                      La modification de l&apos;email peut necessiter une
+                      verification.
                     </p>
                     <Link
                       className={buttonVariants({
@@ -368,7 +367,7 @@ export default async function TenantAccountPage() {
                     >
                       Gérer mes identifiants
                     </Link>
-                  </InfoAlert>
+                  </div>
                 </div>
               </div>
             </article>
