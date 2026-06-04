@@ -96,7 +96,7 @@ describe("tenant contract detail", () => {
       "utf8",
     );
     const dashboardSource = readFileSync(
-      join(process.cwd(), "app/(tenant)/tenant/page.tsx"),
+      join(process.cwd(), "components/tenant/tenant-dashboard-view.tsx"),
       "utf8",
     );
 

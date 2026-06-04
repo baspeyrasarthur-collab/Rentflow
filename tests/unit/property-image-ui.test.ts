@@ -13,7 +13,7 @@ describe("property image UI wiring", () => {
       "app/(owner)/owner/properties/[id]/page.tsx",
     );
     const tenantDashboardSource = readWorkspaceFile(
-      "app/(tenant)/tenant/page.tsx",
+      "components/tenant/tenant-dashboard-view.tsx",
     );
     const tenantContractSource = readWorkspaceFile(
       "app/(tenant)/tenant/contracts/[contractId]/page.tsx",
@@ -52,10 +52,10 @@ describe("property image UI wiring", () => {
       "app/(owner)/owner/properties/[id]/page.tsx",
     );
     const ownerDashboardSource = readWorkspaceFile(
-      "app/(owner)/owner/page.tsx",
+      "components/owner/owner-dashboard-view.tsx",
     );
     const tenantDashboardSource = readWorkspaceFile(
-      "app/(tenant)/tenant/page.tsx",
+      "components/tenant/tenant-dashboard-view.tsx",
     );
     const tenantContractSource = readWorkspaceFile(
       "app/(tenant)/tenant/contracts/[contractId]/page.tsx",

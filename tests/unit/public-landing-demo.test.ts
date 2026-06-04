@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+﻿import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
@@ -120,24 +120,41 @@ describe("public landing and demo entry path", () => {
   it("lets the demo switch between owner and tenant modes", () => {
     const demoSource = readWorkspaceFile("app/demo/page.tsx");
     const demoLayoutSource = readWorkspaceFile("app/demo/layout.tsx");
+    const demoHeaderSource = demoSource.slice(
+      demoSource.indexOf("function DemoHeader"),
+      demoSource.indexOf("function DemoNotice"),
+    );
+    const desktopTopbarSource = demoLayoutSource.slice(
+      demoLayoutSource.indexOf('className="sticky top-4'),
+      demoLayoutSource.indexOf('<div className="mx-auto'),
+    );
 
-    expect(demoSource).toContain("Démo — données fictives");
-    expect(demoSource).toContain("Voir la démo locataire");
-    expect(demoSource).toContain("Voir la démo propriétaire");
-    expect(demoSource).toContain("/demo?mode=tenant&page=dashboard");
-    expect(demoSource).toContain("/demo?mode=owner&page=dashboard");
-    expect(demoSource).toContain("Créer un compte");
-    expect(demoSource).toContain("Se connecter");
-    expect(demoSource).toContain("Retour présentation");
+    expect(demoSource).toContain("DÃ©mo â€” donnÃ©es fictives");
+    expect(demoHeaderSource).toContain("CrÃ©er un compte");
+    expect(demoHeaderSource).toContain("Se connecter");
+    expect(demoHeaderSource).not.toContain("Retour prÃ©sentation");
+    expect(demoHeaderSource).not.toContain("RÃ©initialiser la dÃ©mo");
+    expect(demoHeaderSource).not.toContain("Voir la dÃ©mo locataire");
+    expect(demoHeaderSource).not.toContain("Voir la dÃ©mo propriÃ©taire");
     expect(readWorkspaceFile("app/demo/demo-interactions.tsx")).toContain(
       "Réinitialiser la démo",
     );
     expect(demoLayoutSource).toContain("/demo?mode=owner&page=properties");
     expect(demoLayoutSource).toContain("/demo?mode=tenant&page=requests");
+    expect(demoLayoutSource).toContain("/demo?mode=tenant&page=dashboard");
+    expect(demoLayoutSource).toContain("/demo?mode=owner&page=dashboard");
     expect(demoLayoutSource).toContain("Démo — données fictives");
     expect(demoLayoutSource).toContain("Voir la démo locataire");
     expect(demoLayoutSource).toContain("Voir la démo propriétaire");
     expect(demoLayoutSource).toContain("DemoResetButton");
+    expect(demoLayoutSource).toContain("Essayez avec vos données");
+    expect(demoLayoutSource).toContain("min-h-0 flex-1 overflow-y-auto");
+    expect(demoLayoutSource).toContain("mt-auto shrink-0");
+    expect(desktopTopbarSource).toContain('href="/sign-in"');
+    expect(desktopTopbarSource).toContain('href="/sign-up"');
+    expect(desktopTopbarSource).not.toContain("DemoResetButton");
+    expect(desktopTopbarSource).not.toContain("Retour prÃ©sentation");
+    expect(desktopTopbarSource).not.toContain("switchHref");
   });
 
   it("keeps demo actions local and resettable", () => {
@@ -152,37 +169,74 @@ describe("public landing and demo entry path", () => {
     expect(interactionsSource).toContain("DemoSimulatedAction");
     expect(interactionsSource).toContain("DemoTenantRequestComposer");
     expect(interactionsSource).toContain("Aucune donnée réelle");
-    expect(demoSource).toContain("Confirmer un loyer déclaré payé");
-    expect(demoSource).toContain("Confirmer la réception");
-    expect(demoSource).toContain("Générer la quittance");
+    expect(demoSource).toContain("Confirmer un loyer dÃ©clarÃ© payÃ©");
+    expect(demoSource).toContain("Confirmer la rÃ©ception");
+    expect(demoSource).toContain("GÃ©nÃ©rer la quittance");
     expect(demoSource).toContain("Fait");
-    expect(demoSource).toContain("Refusé");
+    expect(demoSource).toContain("RefusÃ©");
     expect(demoSource).toContain("Demander la fin du contrat");
     expect(interactionsSource).toContain("Envoyer la demande (simulation)");
-    expect(demoSource).toContain("Informations enregistrées dans la démo");
+    expect(demoSource).toContain("Informations enregistrÃ©es dans la dÃ©mo");
+  });
+
+  it("shares the owner dashboard presentation between real app and demo", () => {
+    const ownerPageSource = readWorkspaceFile("app/(owner)/owner/page.tsx");
+    const demoSource = readWorkspaceFile("app/demo/page.tsx");
+    const ownerDashboardViewSource = readWorkspaceFile(
+      "components/owner/owner-dashboard-view.tsx",
+    );
+
+    expect(ownerPageSource).toContain("OwnerDashboardView");
+    expect(ownerPageSource).toContain("getOwnerDashboardData");
+    expect(ownerPageSource).toContain("getOwnerNextActions");
+    expect(ownerPageSource).toContain(
+      'addPropertyHref="/owner/properties/new"',
+    );
+    expect(ownerPageSource).toContain('financeHref="/owner/finances"');
+    expect(demoSource).toContain("OwnerDashboardView");
+    expect(demoSource).toContain("usesSharedOwnerDashboard");
+    expect(demoSource).toContain('addPropertyHref="/sign-up"');
+    expect(demoSource).toContain(
+      'financeHref="/demo?mode=owner&page=finances"',
+    );
+    expect(demoSource).toContain("DemoSimulatedAction");
+    expect(ownerDashboardViewSource).toContain("PageHeader");
+    expect(ownerDashboardViewSource).toContain("A faire maintenant");
+    expect(ownerDashboardViewSource).toContain("Recapitulatif du mois");
+    expect(ownerDashboardViewSource).toContain("Mes biens");
+    expect(ownerDashboardViewSource).toContain("Activite recente");
+    expect(ownerDashboardViewSource).toContain("Actions rapides");
+    expect(ownerDashboardViewSource).toContain("OwnerQuickActions");
+    expect(ownerDashboardViewSource).not.toContain("requireOwnerAccess");
+    expect(ownerDashboardViewSource).not.toContain("getOwnerDashboardData");
+    expect(ownerDashboardViewSource).not.toContain("getOwnerNextActions");
+    expect(ownerDashboardViewSource).not.toContain("prisma");
   });
 
   it("simulates the owner pages with fictive app data", () => {
     const demoSource = readWorkspaceFile("app/demo/page.tsx");
     const demoDataSource = readWorkspaceFile("app/demo/demo-data.ts");
+    const ownerDashboardViewSource = readWorkspaceFile(
+      "components/owner/owner-dashboard-view.tsx",
+    );
 
-    expect(demoSource).toContain("À faire maintenant");
+    expect(ownerDashboardViewSource).toContain("A faire maintenant");
     expect(demoSource).toContain("Ajouter un logement");
-    expect(demoSource).toContain("Mettre à jour les loyers");
-    expect(demoSource).toContain("Générer une quittance");
+    expect(demoSource).toContain("Mettre Ã  jour les loyers");
+    expect(demoSource).toContain("GÃ©nÃ©rer une quittance");
     expect(demoSource).toContain("Modifier les contrats");
     expect(demoSource).toContain("Inviter un locataire");
     expect(demoSource).toContain("Exporter mes finances");
     expect(demoSource).toContain("Liste des biens");
-    expect(demoSource).toContain("Détail logement");
+    expect(demoSource).toContain("DÃ©tail logement");
     expect(demoSource).toContain("Photo du logement");
     expect(demoSource).toContain("Adresse");
-    expect(demoSource).toContain("Caractéristiques");
+    expect(demoSource).toContain("CaractÃ©ristiques");
     expect(demoSource).toContain("Contrats");
     expect(demoSource).toContain("Paiements");
     expect(demoSource).toContain("Quittances");
-    expect(demoSource).toContain("Résumé financier");
-    expect(demoSource).toContain("Déclarations");
+    expect(demoSource).toContain("RÃ©sumÃ© financier");
+    expect(demoSource).toContain("DÃ©clarations");
     expect(demoSource).toContain("Locataires actifs et demandes");
     expect(demoDataSource).toContain("Appartement Canal");
     expect(demoDataSource).toContain("Studio République");
@@ -195,14 +249,27 @@ describe("public landing and demo entry path", () => {
   it("shows fictive tenant dashboard and account pages in the public demo", () => {
     const demoSource = readWorkspaceFile("app/demo/page.tsx");
     const demoDataSource = readWorkspaceFile("app/demo/demo-data.ts");
+    const tenantDashboardViewSource = readWorkspaceFile(
+      "components/tenant/tenant-dashboard-view.tsx",
+    );
 
-    expect(demoSource).toContain("Détails contrat");
-    expect(demoSource).toContain("Mettre fin à un contrat");
-    expect(demoSource).toContain("Déclarer un loyer payé");
-    expect(demoSource).toContain("Demande propriétaire");
-    expect(demoSource).toContain("Mon logement");
-    expect(demoSource).toContain("Détail du contrat");
-    expect(demoSource).toContain("Demandes au propriétaire");
+    expect(demoSource).toContain("TenantDashboardView");
+    expect(demoSource).toContain("renderActions={{");
+    expect(demoSource).toContain(
+      'requestsHref="/demo?mode=tenant&page=requests"',
+    );
+    expect(tenantDashboardViewSource).toContain('label="Details contrat"');
+    expect(tenantDashboardViewSource).toContain(
+      'label="Mettre fin a un contrat"',
+    );
+    expect(tenantDashboardViewSource).toContain(
+      'label="Declarer un loyer paye"',
+    );
+    expect(tenantDashboardViewSource).toContain('label="Demande proprietaire"');
+    expect(tenantDashboardViewSource).toContain("Mon logement");
+    expect(demoSource).toContain("DÃ©tail du contrat");
+    expect(demoSource).toContain("Demandes au propriÃ©taire");
+    expect(tenantDashboardViewSource).toContain("Marquer comme vue");
     expect(demoSource).toContain("Marquer comme vue");
     expect(demoSource).toContain("Mon compte");
     expect(demoSource).toContain("Changer d&apos;espace");
@@ -219,7 +286,7 @@ describe("public landing and demo entry path", () => {
       "app/demo/demo-interactions.tsx",
     );
 
-    expect(demoSource).toContain("Action simulée");
+    expect(demoSource).toContain("Action simulÃ©e");
     expect(demoSource).toContain('href="/sign-up"');
     expect(demoSource).not.toContain('"use server"');
     expect(demoSource).not.toContain("requireOwnerAccess");

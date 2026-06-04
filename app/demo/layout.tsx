@@ -155,8 +155,6 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
       : "/demo?mode=owner&page=dashboard";
   const switchLabel =
     mode === "owner" ? "Voir la démo locataire" : "Voir la démo propriétaire";
-  const topActionClassName =
-    "group/top-action inline-flex h-10 w-10 items-center justify-start gap-2 overflow-hidden rounded-full border border-border/80 bg-card/85 px-2.5 text-sm font-medium text-muted-foreground shadow-sm shadow-black/10 backdrop-blur transition-all duration-300 hover:w-56 hover:border-primary/45 hover:bg-primary/12 hover:text-foreground focus-visible:w-56 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
   useEffect(() => {
     applyThemePreference(theme);
@@ -199,65 +197,67 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
           isSidebarCollapsed ? "w-20 px-3 py-4" : "w-72 px-4 py-4",
         )}
       >
-        <Link
-          aria-label="RentFlow"
-          className={cn(
-            "flex items-center rounded-lg py-2 transition-opacity hover:opacity-90",
-            isSidebarCollapsed ? "justify-center px-0" : "px-2",
-          )}
-          href="/demo"
-          title="RentFlow"
-        >
-          <BrandLogo
-            iconClassName="size-12"
-            priority
-            showWordmark={!isSidebarCollapsed}
-            wordmarkClassName="h-8 w-32"
-          />
-        </Link>
+        <div className="shrink-0">
+          <Link
+            aria-label="RentFlow"
+            className={cn(
+              "flex items-center rounded-lg py-2 transition-opacity hover:opacity-90",
+              isSidebarCollapsed ? "justify-center px-0" : "px-2",
+            )}
+            href="/demo"
+            title="RentFlow"
+          >
+            <BrandLogo
+              iconClassName="size-12"
+              priority
+              showWordmark={!isSidebarCollapsed}
+              wordmarkClassName="h-8 w-32"
+            />
+          </Link>
 
-        <div
-          className={cn(
-            "mt-3 rounded-xl border bg-background/45",
-            isSidebarCollapsed ? "p-2" : "space-y-2 px-3 py-2.5",
-          )}
-        >
           <div
             className={cn(
-              "flex items-center gap-2",
-              isSidebarCollapsed && "justify-center",
+              "mt-3 rounded-xl border bg-background/45",
+              isSidebarCollapsed ? "p-2" : "space-y-2 px-3 py-2.5",
             )}
           >
-            <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-              Démo
-            </span>
-            <span
+            <div
               className={cn(
-                "text-xs text-muted-foreground",
-                isSidebarCollapsed && "sr-only",
+                "flex items-center gap-2",
+                isSidebarCollapsed && "justify-center",
               )}
             >
-              Données fictives
-            </span>
+              <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                Démo
+              </span>
+              <span
+                className={cn(
+                  "text-xs text-muted-foreground",
+                  isSidebarCollapsed && "sr-only",
+                )}
+              >
+                Données fictives
+              </span>
+            </div>
+            <Link
+              className={cn(
+                "inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary to-ring px-3 py-2 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                isSidebarCollapsed &&
+                  "size-10 rounded-xl p-0 text-primary-foreground",
+              )}
+              href={switchHref}
+              title={switchLabel}
+            >
+              <ArrowLeftRight className="size-4 shrink-0" />
+              <span className={cn(isSidebarCollapsed && "sr-only")}>
+                {switchLabel}
+              </span>
+            </Link>
           </div>
-          <Link
-            className={cn(
-              "inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary to-ring px-3 py-2 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              isSidebarCollapsed &&
-                "size-10 rounded-xl p-0 text-primary-foreground",
-            )}
-            href={switchHref}
-            title={switchLabel}
-          >
-            <ArrowLeftRight className="size-4 shrink-0" />
-            <span className={cn(isSidebarCollapsed && "sr-only")}>
-              {switchLabel}
-            </span>
-          </Link>
         </div>
 
-        <div className="min-h-0 flex-1">
-          <nav aria-label="Navigation demo" className="mt-4">
+        <div className="min-h-0 flex-1 overflow-y-auto py-4">
+          <nav aria-label="Navigation demo">
             <ul className="space-y-1">
               {navLinks.map((link) => {
                 const Icon = link.icon;
@@ -301,7 +301,7 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
 
         <div
           className={cn(
-            "mt-3 rounded-xl border bg-background/45",
+            "mt-auto shrink-0 rounded-xl border bg-background/45",
             isSidebarCollapsed ? "p-2" : "space-y-2 p-2.5",
           )}
         >
@@ -311,16 +311,9 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
               isSidebarCollapsed && "sr-only",
             )}
           >
-            Tester avec vos données
+            Essayez avec vos données
           </p>
           <div className={cn("grid gap-2", isSidebarCollapsed && "gap-1")}>
-            <DemoResetButton
-              className={cn(
-                "w-full",
-                isSidebarCollapsed &&
-                  "size-8 justify-center rounded-lg p-0 [&_svg]:size-4",
-              )}
-            />
             <Link
               aria-label="Créer un compte"
               className={buttonVariants({
@@ -349,6 +342,23 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
               ) : (
                 "Se connecter"
               )}
+            </Link>
+            <DemoResetButton
+              className={cn(
+                "w-full border-transparent bg-transparent text-xs text-muted-foreground shadow-none hover:bg-muted hover:text-foreground",
+                isSidebarCollapsed &&
+                  "size-8 justify-center rounded-lg p-0 [&_svg]:size-4",
+              )}
+            />
+            <Link
+              aria-label="Retour présentation"
+              className={cn(
+                "inline-flex min-h-8 items-center justify-center rounded-lg px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+                isSidebarCollapsed && "sr-only",
+              )}
+              href="/"
+            >
+              Retour présentation
             </Link>
           </div>
         </div>
@@ -389,19 +399,14 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
             />
           </Link>
           <div className="flex items-center gap-2">
+            <Link
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+              href="/sign-in"
+            >
+              Se connecter
+            </Link>
             <Link className={buttonVariants({ size: "sm" })} href="/sign-up">
               Créer un compte
-            </Link>
-            <DemoResetButton className="hidden sm:inline-flex" />
-            <Link
-              className={buttonVariants({
-                variant: "outline",
-                size: "icon-sm",
-              })}
-              href="/sign-in"
-              title="Se connecter"
-            >
-              <LogIn className="size-3.5" />
             </Link>
             <button
               aria-label={
@@ -451,6 +456,7 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
               <ArrowLeftRight className="size-3.5" />
               {switchLabel}
             </Link>
+            <DemoResetButton className="h-8 border-transparent bg-transparent px-2 text-xs text-muted-foreground shadow-none hover:bg-muted hover:text-foreground" />
           </div>
           <nav aria-label="Navigation demo mobile" className="overflow-x-auto">
             <ul className="flex min-w-max gap-2">
@@ -490,67 +496,14 @@ function DemoLayoutContent({ children }: DemoLayoutProps) {
       >
         <div className="sticky top-4 z-30 mb-4 hidden justify-end gap-2 md:flex">
           <Link
-            className={cn(
-              buttonVariants({ size: "sm" }),
-              "h-10 gap-2 rounded-full bg-gradient-to-r from-primary to-ring px-4 font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/25",
-            )}
-            href={switchHref}
+            className={buttonVariants({ variant: "outline", size: "sm" })}
+            href="/sign-in"
           >
-            <ArrowLeftRight className="size-4" />
-            {switchLabel}
+            Se connecter
           </Link>
-          <DemoResetButton className="h-10 rounded-full px-4" />
-          <Link
-            className={topActionClassName}
-            href="/"
-            title="Retour présentation"
-          >
-            <Sparkles className="size-4 shrink-0 text-primary" />
-            <span className="whitespace-nowrap opacity-0 transition-opacity duration-300 group-hover/top-action:opacity-100 group-focus-visible/top-action:opacity-100">
-              Retour présentation
-            </span>
+          <Link className={buttonVariants({ size: "sm" })} href="/sign-up">
+            Créer un compte
           </Link>
-          <button
-            aria-label={
-              isDarkTheme ? "Activer le mode clair" : "Activer le mode sombre"
-            }
-            aria-pressed={!isDarkTheme}
-            className={topActionClassName}
-            onClick={toggleTheme}
-            type="button"
-          >
-            {isDarkTheme ? (
-              <Sun className="size-4 shrink-0 text-primary" />
-            ) : (
-              <Moon className="size-4 shrink-0 text-primary" />
-            )}
-            <span className="whitespace-nowrap opacity-0 transition-opacity duration-300 group-hover/top-action:opacity-100 group-focus-visible/top-action:opacity-100">
-              {isDarkTheme ? "Mode clair" : "Mode sombre"}
-            </span>
-          </button>
-          <button
-            aria-label={
-              areSpotlightEffectsEnabled
-                ? "Désactiver les effets lumineux"
-                : "Activer les effets lumineux"
-            }
-            aria-pressed={!areSpotlightEffectsEnabled}
-            className={topActionClassName}
-            onClick={toggleSpotlightEffects}
-            title={
-              areSpotlightEffectsEnabled
-                ? "Désactiver les effets lumineux"
-                : "Activer les effets lumineux"
-            }
-            type="button"
-          >
-            <Sparkles className="size-4 shrink-0 text-primary" />
-            <span className="whitespace-nowrap opacity-0 transition-opacity duration-300 group-hover/top-action:opacity-100 group-focus-visible/top-action:opacity-100">
-              {areSpotlightEffectsEnabled
-                ? "Effets lumineux off"
-                : "Effets lumineux on"}
-            </span>
-          </button>
         </div>
         <div className="mx-auto w-full max-w-[1500px]">{children}</div>
       </main>

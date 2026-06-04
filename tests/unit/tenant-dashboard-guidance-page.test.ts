@@ -3,10 +3,15 @@ import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-const tenantPageSource = readFileSync(
+const tenantRouteSource = readFileSync(
   join(process.cwd(), "app/(tenant)/tenant/page.tsx"),
   "utf8",
 );
+const tenantViewSource = readFileSync(
+  join(process.cwd(), "components/tenant/tenant-dashboard-view.tsx"),
+  "utf8",
+);
+const tenantPageSource = `${tenantViewSource}\n${tenantRouteSource}`;
 
 describe("tenant dashboard guidance UI", () => {
   it("keeps the urgent actions section at the top of the tenant dashboard", () => {
@@ -62,6 +67,7 @@ describe("tenant dashboard guidance UI", () => {
   it("lets tenants mark an available receipt as seen from urgent actions", () => {
     expect(tenantPageSource).toContain("markTenantReceiptAsSeenAction");
     expect(tenantPageSource).toContain("unseenAvailableReceipts");
+    expect(tenantPageSource).toContain("serverActions.markReceiptAsSeen");
     expect(tenantPageSource).toContain("Marquer comme vue");
     expect(tenantPageSource).toContain('name="receiptId"');
   });
@@ -79,7 +85,7 @@ describe("tenant dashboard guidance UI", () => {
     expect(tenantPageSource).toContain('label="Mettre fin a un contrat"');
     expect(tenantPageSource).toContain('label="Declarer un loyer paye"');
     expect(tenantPageSource).toContain('label="Demande proprietaire"');
-    expect(tenantPageSource).toContain('href="/tenant/requests"');
+    expect(tenantPageSource).toContain('requestsHref = "/tenant/requests"');
     expect(tenantPageSource).toContain('href="#tenant-contract-termination"');
     expect(tenantPageSource).toContain('href="#declare-rent-paid"');
     expect(tenantPageSource).not.toContain('title="Demandes recentes"');

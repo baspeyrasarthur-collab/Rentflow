@@ -7,6 +7,10 @@ const tenantDashboardSource = readFileSync(
   join(process.cwd(), "app/(tenant)/tenant/page.tsx"),
   "utf8",
 );
+const tenantDashboardViewSource = readFileSync(
+  join(process.cwd(), "components/tenant/tenant-dashboard-view.tsx"),
+  "utf8",
+);
 const tenantRequestsPageSource = readFileSync(
   join(process.cwd(), "app/(tenant)/tenant/requests/page.tsx"),
   "utf8",
@@ -40,17 +44,25 @@ describe("tenant requests page UI", () => {
   });
 
   it("keeps tenant request actions on the dashboard without duplicating the request page", () => {
-    expect(tenantDashboardSource).not.toContain('title="Demandes recentes"');
-    expect(tenantDashboardSource).toContain("/tenant/requests");
+    expect(tenantDashboardViewSource).not.toContain(
+      'title="Demandes recentes"',
+    );
+    expect(tenantDashboardViewSource).toContain("/tenant/requests");
     expect(tenantDashboardSource).not.toContain(
       "action={createTenantRequestAction}",
     );
-    expect(tenantDashboardSource).not.toContain("Envoyer la demande");
+    expect(tenantDashboardViewSource).not.toContain("Envoyer la demande");
     expect(tenantDashboardSource).toContain(
-      "action={acknowledgeResolvedTenantRequestAction}",
+      "acknowledgeResolvedTenantRequestAction",
     );
     expect(tenantDashboardSource).toContain(
-      "action={acknowledgeRefusedTenantRequestAction}",
+      "acknowledgeRefusedTenantRequestAction",
+    );
+    expect(tenantDashboardViewSource).toContain(
+      "serverActions.acknowledgeResolvedTenantRequest",
+    );
+    expect(tenantDashboardViewSource).toContain(
+      "serverActions.acknowledgeRefusedTenantRequest",
     );
   });
 });

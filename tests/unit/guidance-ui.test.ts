@@ -23,13 +23,13 @@ describe("owner and tenant guidance UI", () => {
 
   it("keeps uploaded image cards out of mouse spotlight wrappers while preserving zoom", () => {
     const ownerDashboardSource = readWorkspaceFile(
-      "app/(owner)/owner/page.tsx",
+      "components/owner/owner-dashboard-view.tsx",
     );
     const ownerListSource = readWorkspaceFile(
       "app/(owner)/owner/properties/page.tsx",
     );
     const tenantDashboardSource = readWorkspaceFile(
-      "app/(tenant)/tenant/page.tsx",
+      "components/tenant/tenant-dashboard-view.tsx",
     );
     const tenantContractSource = readWorkspaceFile(
       "app/(tenant)/tenant/contracts/[contractId]/page.tsx",
@@ -69,7 +69,7 @@ describe("owner and tenant guidance UI", () => {
 
   it("keeps tenant property photos compact and framed on the dashboard", () => {
     const tenantDashboardSource = readWorkspaceFile(
-      "app/(tenant)/tenant/page.tsx",
+      "components/tenant/tenant-dashboard-view.tsx",
     );
 
     expect(tenantDashboardSource).toContain("function TenantPropertyImage");
